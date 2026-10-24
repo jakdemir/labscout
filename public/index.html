@@ -145,6 +145,14 @@
   .starters .chip { height: auto; border: 1px solid #303030; background: #171717; color: #a3a3a3; padding: 9px 13px; font-size: 12px; border-radius: 999px; gap: 10px; }
   .starters .chip span { color: #a3a3a3; }
   .starters .chip:hover { background: #262626; border-color: #525252; color: #fff; }
+  .starters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .starters > span { grid-column: 1 / -1; }
+  .starters .chip.prompt { display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr; gap: 6px 10px; align-items: start; height: auto; white-space: normal; text-align: left; border-radius: 10px; padding: 12px 14px; line-height: 1.45; }
+  .starters .chip.prompt small { grid-column: 1; font: 500 9.5px/1 var(--mono); letter-spacing: 1.1px; text-transform: uppercase; color: #F2E96B; }
+  .starters .chip.prompt .pq { grid-column: 1; font: 400 12.5px/1.45 var(--sans); color: #c9c9c3; }
+  .starters .chip.prompt .go { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  .starters .chip.prompt:hover .pq { color: #fff; }
+  @media (max-width: 720px) { .starters { grid-template-columns: 1fr; } }
   body.has-thread .ls-foot { display: none; }
   .follow-hint { display: none; }
   body.has-thread:not(.is-loading) .connect,
@@ -264,14 +272,14 @@
         <p class="notice" id="source-notice" hidden></p>
         <div class="scope"><span class="scope-mark" aria-hidden="true">↳</span><span class="scope-copy">A thesis, a shortlist, a document. Start anywhere.</span><span class="follow-hint">Enter to send · Shift+Enter new line</span><button type="button" id="reset" hidden></button></div>
         <div class="starters" id="starters">
-          <!-- demo-tested on prod: each returns 10 students, 18–42 linked signals, 7–11 sources with evidence -->
+          <!-- demo-tested on prod: each returns 9-10 people, 29-84 linked signals, 8-16 sources with evidence -->
           <span>TRY A THREAD</span>
-          <button type="button" class="chip" data-q="PhD students designing de novo protein binders with diffusion models and AlphaFold-style structure prediction, with open-source code and wet-lab validation" title="PhD students designing de novo protein binders with diffusion models and AlphaFold-style structure prediction, with open-source code and wet-lab validation">De novo binders <span>↗</span></button>
-          <button type="button" class="chip" data-q="Researchers engineering CRISPR base and prime editors with machine-learned guide design, close to a therapeutics spinout" title="Researchers engineering CRISPR base and prime editors with machine-learned guide design, close to a therapeutics spinout">CRISPR editors <span>↗</span></button>
-          <button type="button" class="chip" data-q="Single-cell and spatial transcriptomics students building foundation models for cell state and perturbation response prediction" title="Single-cell and spatial transcriptomics students building foundation models for cell state and perturbation response prediction">Single-cell foundation models <span>↗</span></button>
-          <button type="button" class="chip" data-q="Computational immunology students designing antibodies and TCRs with protein language models" title="Computational immunology students designing antibodies and TCRs with protein language models">Antibody & TCR design <span>↗</span></button>
-          <button type="button" class="chip" data-q="Students developing closed-loop brain-computer interfaces with high-density neural recordings and on-device decoding" title="Students developing closed-loop brain-computer interfaces with high-density neural recordings and on-device decoding">Closed-loop BCI <span>↗</span></button>
-          <button type="button" class="chip" data-q="Researchers building mRNA and lipid nanoparticle delivery platforms with machine-learning formulation design" title="Researchers building mRNA and lipid nanoparticle delivery platforms with machine-learning formulation design">mRNA-LNP delivery <span>↗</span></button>
+          <button type="button" class="chip prompt" data-q="PhD students designing de novo protein binders with RFdiffusion-style diffusion models, ProteinMPNN sequence design and AlphaFold-style structure prediction, with open-source code and wet-lab binding validation"><small>Protein design</small><span class="pq">PhD students designing de novo protein binders with RFdiffusion-style diffusion models, ProteinMPNN sequence design and AlphaFold-style structure prediction, with open-source code and wet-lab binding validation</span><span class="go" aria-hidden="true">↗</span></button>
+          <button type="button" class="chip prompt" data-q="Researchers engineering CRISPR base and prime editors with machine-learned guide RNA design, Cas9 variant engineering and off-target prediction, close to a therapeutics spinout"><small>Gene editing</small><span class="pq">Researchers engineering CRISPR base and prime editors with machine-learned guide RNA design, Cas9 variant engineering and off-target prediction, close to a therapeutics spinout</span><span class="go" aria-hidden="true">↗</span></button>
+          <button type="button" class="chip prompt" data-q="Single-cell and spatial transcriptomics students (scRNA-seq, Perturb-seq, spatial omics) building foundation models that predict cell state and genetic perturbation response"><small>Single-cell AI</small><span class="pq">Single-cell and spatial transcriptomics students (scRNA-seq, Perturb-seq, spatial omics) building foundation models that predict cell state and genetic perturbation response</span><span class="go" aria-hidden="true">↗</span></button>
+          <button type="button" class="chip prompt" data-q="Computational immunology students designing antibodies and T-cell receptors with protein language models, epitope prediction and developability scoring for affinity maturation"><small>Immunoengineering</small><span class="pq">Computational immunology students designing antibodies and T-cell receptors with protein language models, epitope prediction and developability scoring for affinity maturation</span><span class="go" aria-hidden="true">↗</span></button>
+          <button type="button" class="chip prompt" data-q="Students developing closed-loop brain-computer interfaces with high-density neural recordings, spike sorting and low-latency on-device neural decoding"><small>Neurotech</small><span class="pq">Students developing closed-loop brain-computer interfaces with high-density neural recordings, spike sorting and low-latency on-device neural decoding</span><span class="go" aria-hidden="true">↗</span></button>
+          <button type="button" class="chip prompt" data-q="Researchers building mRNA therapeutics and ionizable lipid nanoparticle delivery platforms with machine-learning formulation design for tissue-targeted expression"><small>Drug delivery</small><span class="pq">Researchers building mRNA therapeutics and ionizable lipid nanoparticle delivery platforms with machine-learning formulation design for tissue-targeted expression</span><span class="go" aria-hidden="true">↗</span></button>
         </div>
       </div>
     </div>
