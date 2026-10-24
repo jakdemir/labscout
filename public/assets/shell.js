@@ -60,7 +60,7 @@
     foot.outerHTML =
       '<footer class="ls-foot"><div class="wrap">' +
         "<span>Team 9 · Deal Flow NYC VC Hackathon · Track 1 Sourcing</span>" +
-        '<span class="sp"><span>Nicrron</span><span>PRISM</span><span>akta.pro</span><span>Roundtable</span></span>' +
+        '<span class="sp"><a href="/sponsors">Nicrron</a><a href="/sponsors">PRISM</a><a href="/sponsors">akta.pro</a><a href="/sponsors">Roundtable</a></span>' +
       "</div></footer>";
   }
 

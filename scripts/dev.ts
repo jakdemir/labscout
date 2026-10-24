@@ -17,7 +17,7 @@ const { handleRpc } = await import("../lib/mcp.ts");
 const { thesisFromText } = await import("../lib/thesis.ts");
 
 const PUB = new URL("../public/", import.meta.url).pathname;
-const TYPES: Record<string, string> = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2", ".mjs": "text/javascript", ".md": "text/markdown", ".json": "application/json" };
+const TYPES: Record<string, string> = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".gif": "image/gif", ".woff2": "font/woff2", ".mjs": "text/javascript", ".md": "text/markdown", ".json": "application/json" };
 
 http.createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/api/search") {
