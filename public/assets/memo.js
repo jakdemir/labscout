@@ -33,5 +33,5 @@ export function memoHtml(d, list, criteria, now = new Date()) {
     `<button class="p" onclick="print()">Print / Save PDF</button>` +
     `<header><p class="m">LABSCOUT · STUDENT SHORTLIST · ${now.toISOString().slice(0, 10)}</p><h1>${esc(d.query)}</h1>` +
     `<p class="m">${esc(d.totalWorks ?? 0)} papers → ${list.length} students · keywords “${esc(d.keywords)}”</p>${crit}</header>${rows}` +
-    `<footer class="m">Every line links to its source: OpenAlex, ORCID and 24 founder-signal sources. Briefs and fit checks by Claude via Nicrron. labscout-nyc.vercel.app</footer></body></html>`;
+    `<footer class="m">Every line links to its source: OpenAlex, ORCID and 27 founder-signal sources. Briefs and fit checks by Claude via Nicrron. labscout-nyc.vercel.app</footer></body></html>`;
 }

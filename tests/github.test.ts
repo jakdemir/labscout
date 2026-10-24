@@ -62,7 +62,18 @@ test("collectSignals: failing, hanging-free and disabled sources never break the
   const bad: SourceModule = { id: "arxiv", enabled: () => true, enrich: async () => { throw new Error("boom"); } };
   const off: SourceModule = { id: "nsf", enabled: () => false, enrich: async () => { throw new Error("should not run"); } };
   const c = cand();
-  await collectSignals([c], { query: "q", keywords: "k" }, [ok, bad, off]);
+  const cov = await collectSignals([c], { query: "q", keywords: "k" }, [ok, bad, off]);
   assert.equal(c.signals.length, 1);
   assert.equal(c.signals[0].label, "a/b");
+  // coverage: every registered source reported, including the failing and the disabled one
+  assert.deepEqual(cov.map((r) => [r.id, r.status, r.candidates, r.signals]), [["github", "hit", 1, 1], ["arxiv", "none", 0, 0], ["nsf", "off", 0, 0]]);
+  assert.equal(cov[2].reason, "disabled");
+});
+test("collectSignals coverage: off reason for keyed sources, wave recorded", async () => {
+  const gh: SourceModule = { id: "github", enabled: () => false, enrich: async () => [] };
+  const w2: SourceModule = { id: "hackernews", wave: 2, enabled: () => true, enrich: async () => [] };
+  const cov = await collectSignals([cand()], { query: "q", keywords: "k" }, [gh, w2]);
+  assert.equal(cov[0].reason, "needs GITHUB_TOKEN");
+  assert.equal(cov[1].wave, 2);
+  assert.equal(cov[1].status, "none");
 });

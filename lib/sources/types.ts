@@ -5,13 +5,13 @@ import type { Candidate } from "../types.ts";
 export type SourceId =
   | "github" | "arxiv" | "semanticscholar" | "nsf" | "patentsview" | "sbir"
   // builder
-  | "huggingface" | "packages" | "zenodo" | "papercode"
+  | "huggingface" | "packages" | "zenodo" | "papercode" | "releases" | "datacite"
   // academic / identity
-  | "crossref" | "orcid" | "europepmc" | "cordis" | "wikidata" | "dissertations" | "nih"
+  | "crossref" | "orcid" | "europepmc" | "cordis" | "wikidata" | "dissertations" | "nih" | "osf"
   // entity formation / money
-  | "nycorp" | "edgar" | "usaspending" | "clinicaltrials" | "yc"
-  // social / launch
-  | "bluesky" | "hackernews";
+  | "nycorp" | "edgar" | "usaspending" | "clinicaltrials" | "yc" | "openfda"
+  // standards / social / launch
+  | "ietf" | "bluesky" | "hackernews";
 
 export type Signal = {
   source: SourceId;

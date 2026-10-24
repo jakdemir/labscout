@@ -19,7 +19,35 @@
     zenodo: "ZENODO", crossref: "CROSSREF", orcid: "ORCID", europepmc: "EUROPE PMC", cordis: "CORDIS",
     wikidata: "WIKIDATA", dissertations: "THESIS", nycorp: "NY DOS", edgar: "SEC", usaspending: "USASPENDING",
     clinicaltrials: "CLINICALTRIALS", yc: "YC", bluesky: "BLUESKY", hackernews: "HACKER NEWS",
+    releases: "GITHUB RELEASES", datacite: "DATACITE", osf: "OSF", openfda: "OPENFDA", ietf: "IETF",
   };
+  function srcName(id) { return SOURCES[id] || String(id || "").toUpperCase(); }
+  /** Search-wide tally of the coverage rows the API returns (one per registered source). */
+  function coverageSummary(sources) {
+    var list = sources || [], s = { total: list.length, hit: 0, none: 0, off: 0 };
+    list.forEach(function (x) { if (s[x.status] != null) s[x.status]++; });
+    s.checked = s.total - s.off;
+    return s;
+  }
+  /** Every source, marked for THIS student: evidence found / checked, nothing verified / not queried (with reason). */
+  function sourcesBlock(c, sources) {
+    var list = sources || [];
+    if (!list.length) return "";
+    var mine = {};
+    (c.signals || []).forEach(function (sig) { mine[sig.source] = (mine[sig.source] || 0) + 1; });
+    var rank = function (x) { return mine[x.id] ? 0 : x.status === "off" ? 2 : 1; };
+    var sorted = list.slice().sort(function (a, b) { return rank(a) - rank(b) || (mine[b.id] || 0) - (mine[a.id] || 0); });
+    var hits = sorted.filter(function (x) { return mine[x.id]; }).length, sum = coverageSummary(list);
+    var chips = sorted.map(function (x) {
+      var n = mine[x.id] || 0, st = n ? "hit" : x.status === "off" ? "off" : "none";
+      var title = st === "hit" ? n + " signal" + (n === 1 ? "" : "s") + " for this student"
+        : st === "off" ? "Not queried: " + (x.reason || "disabled")
+        : "Queried · no verified match for this student";
+      return '<span class="rk-src ' + st + '" title="' + esc(title) + '">' + esc(srcName(x.id)) + (n ? " <b>" + n + "</b>" : "") + "</span>";
+    }).join("");
+    return '<div class="rk-sources"><div class="rk-label"><span>Sources checked · ' + hits + " of " + sum.checked + " with evidence</span><span>" +
+      sum.checked + " public APIs queried" + (sum.off ? " · " + sum.off + " off" : "") + '</span></div><div class="rk-srcs">' + chips + "</div></div>";
+  }
   var TRAITS = [
     { name: "Speed of learning", key: "t1" },
     { name: "Customer obsession", key: "t2" },
@@ -54,7 +82,7 @@
   function evidenceOf(c) {
     var rows = [];
     (c.signals || []).forEach(function (s) {
-      rows.push({ stage: +s.stage || 0, time: day(s.date), date: dateLabel(s.date), text: s.label, source: SOURCES[s.source] || String(s.source || "").toUpperCase(), url: s.url, weight: +s.weight || 0 });
+      rows.push({ stage: +s.stage || 0, time: day(s.date), date: dateLabel(s.date), text: s.label, source: srcName(s.source), url: s.url, weight: +s.weight || 0 });
     });
     (c.works || []).forEach(function (w) {
       rows.push({ stage: 1, time: w.year ? Date.UTC(+w.year, 0, 1) : null, date: w.year ? String(w.year) : "", text: w.title, source: "PAPER", url: w.url, weight: 1, paper: true });
@@ -168,10 +196,10 @@
       return '<button type="button" data-act="call" data-call="' + id + '" aria-pressed="' + (partner.call === id) + '">' + label + "</button>";
     }).join("");
     return '<section class="rk"><div class="rk-top"><button type="button" data-act="drawer">← Back to drawer</button><span>Scorecard · File ' + esc(view.file) + " · Refreshed " + esc(view.refreshed) + "</span></div>" +
-      hero(view) + '<div class="rk-rows">' + rows + '</div><div class="rk-split"><div class="rk-velocity"><div class="rk-label"><span>Signal velocity · last 12 months</span><span>1 square = 1 new signal</span></div><div class="rk-months">' + months + "</div></div>" +
+      hero(view) + '<div class="rk-rows">' + rows + "</div>" + sourcesBlock(c, opts.sources) + '<div class="rk-split"><div class="rk-velocity"><div class="rk-label"><span>Signal velocity · last 12 months</span><span>1 square = 1 new signal</span></div><div class="rk-months">' + months + "</div></div>" +
       '<div class="rk-partner"><div class="rk-label"><span>Partner read</span><span>the tool can\'t see these</span></div>' + traits + '<div class="rk-calls">' + calls + "</div></div></div>" +
       (opts.mail ? '<div class="mail"><pre>' + opts.mail + "</pre></div>" : "") + "</section>";
   }
 
-  return { model: model, verdictFor: verdictFor, blocksFor: blocksFor, spotlight: spotlight, scorecard: scorecard };
+  return { model: model, verdictFor: verdictFor, blocksFor: blocksFor, spotlight: spotlight, scorecard: scorecard, sourcesBlock: sourcesBlock, coverageSummary: coverageSummary, srcName: srcName };
 });

@@ -59,7 +59,14 @@ export type SearchResponse = {
   roundtable: { path: string; version: string | null; bank: string | null } | null; // saved shortlist
   changes: Changes | null;                               // diff vs the previous saved shortlist for this thesis
   tookMs?: number;
+  sources?: SourceCoverage[];                            // every registered signal source and what it returned this run
   integrations: { nicrron: boolean; prism: boolean; akta: boolean; roundtable: boolean };
+};
+
+/** One row per registered source: "hit" = evidence for ≥1 candidate, "none" = queried, no verified match, "off" = not queried. */
+export type SourceCoverage = {
+  id: string; wave: 1 | 2; status: "hit" | "none" | "off"; reason?: string;
+  candidates: number; signals: number; timeouts: number; ms: number;
 };
 
 export type Fit = { criterion: string; verdict: "yes" | "partial" | "no"; evidence: string };

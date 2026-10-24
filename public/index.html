@@ -66,6 +66,7 @@
   .src { font: 500 10.5px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; border: 1px solid var(--ink); border-radius: 3px; padding: 2px 4px; margin-right: 6px; vertical-align: 1px; }
   .tag { color: var(--ink-3); font: 400 12px var(--mono); }
   .ev-empty { color: var(--ink-3); font-size: 14px; }
+  .evgrp li.ev-none { color: var(--ink-3); font-size: 13px; }
   .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding-top: 16px; border-top: 1px solid var(--hair); }
   .actions .btn { height: 34px; font-size: 11.5px; }
   .why { font: 400 13px/1.5 var(--mono); }
@@ -80,6 +81,18 @@
   .integ span { display: inline-flex; align-items: center; gap: 7px; }
   .next { display: flex; flex-wrap: wrap; gap: 8px; }
   .empty { border: var(--bw) dashed var(--ink); border-radius: var(--r); padding: 18px; background: var(--sheet); }
+  .rk-srcs, .cov-srcs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .rk-src { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px; border: 1.5px solid #111; border-radius: 4px; font: 500 11px/1 var(--mono); letter-spacing: .04em; cursor: default; }
+  .rk-src.hit { background: #111; color: #F4F4F1; }
+  .rk-src.hit b { background: var(--hi); color: #111; padding: 2px 5px; border-radius: 3px; font-weight: 600; }
+  .rk-src.none { color: #3A3A36; }
+  .rk-src.off { border-style: dashed; color: #6A6A64; text-decoration: line-through; text-decoration-thickness: 1px; }
+  .cov { margin: 0 0 18px; font: 400 12.5px/1.5 var(--mono); }
+  .cov summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; list-style: none; }
+  .cov summary::-webkit-details-marker { display: none; }
+  .cov summary .label { background: var(--hi); padding: 2px 6px; border-radius: 4px; }
+  .cov summary u { text-decoration-color: var(--rule-2); text-underline-offset: 3px; }
+  .cov .cov-srcs { margin-top: 10px; }
   .load-anim { display: grid; justify-items: center; gap: 12px; width: 100%; padding: 12px 0 4px; text-align: center; }
   .load-anim .eyebrow { margin: 0; font: 500 9px/1 var(--mono); letter-spacing: 1.8px; color: #6a685f; }
   .load-anim h2 { margin: 0; max-width: 16em; min-height: 2.3em; font-family: "Iowan Old Style", Baskerville, "Palatino Linotype", Georgia, serif; font-size: clamp(28px, 4vw, 46px); font-weight: 400; letter-spacing: -.035em; line-height: 1.15; }
@@ -273,8 +286,17 @@
   resetBtn.innerHTML = icon("refresh", 12) + "New thesis";
 
   var NOW_Y = new Date().getFullYear();
-  var SRC = { github: "GitHub", arxiv: "arXiv", semanticscholar: "Semantic Scholar", nsf: "NSF", nih: "NIH", patentsview: "USPTO", sbir: "SBIR", huggingface: "Hugging Face", papercode: "Paper code", packages: "PyPI/npm", zenodo: "Zenodo", crossref: "Crossref", orcid: "ORCID", europepmc: "Europe PMC", cordis: "CORDIS", wikidata: "Wikidata", dissertations: "Thesis", nycorp: "NY DOS", edgar: "SEC", usaspending: "USAspending", clinicaltrials: "ClinicalTrials", yc: "YC", bluesky: "Bluesky", hackernews: "HN" };
+  var SRC = { github: "GitHub", arxiv: "arXiv", semanticscholar: "Semantic Scholar", nsf: "NSF", nih: "NIH", patentsview: "USPTO", sbir: "SBIR", huggingface: "Hugging Face", papercode: "Paper code", packages: "PyPI/npm", zenodo: "Zenodo", crossref: "Crossref", orcid: "ORCID", europepmc: "Europe PMC", cordis: "CORDIS", wikidata: "Wikidata", dissertations: "Thesis", nycorp: "NY DOS", edgar: "SEC", usaspending: "USAspending", clinicaltrials: "ClinicalTrials", yc: "YC", bluesky: "Bluesky", hackernews: "HN", releases: "GitHub releases", datacite: "DataCite", osf: "OSF", openfda: "openFDA", ietf: "IETF" };
   var STAGES = { 1: "Research quality", 2: "Builder", 3: "Commercial pull", 4: "Spinout intent", 5: "Traction", 6: "Track record" };
+  // which public APIs can emit each stage (docs/SOURCES.md) — so an empty stage still says what was checked
+  var STAGE_SRC = {
+    1: ["arxiv", "semanticscholar", "europepmc", "osf", "dissertations", "orcid", "nih"],
+    2: ["github", "papercode", "releases", "huggingface", "packages", "zenodo", "datacite"],
+    3: ["crossref", "orcid", "clinicaltrials", "ietf", "bluesky"],
+    4: ["nsf", "nih", "sbir", "patentsview", "nycorp", "edgar", "dissertations", "orcid", "bluesky"],
+    5: ["yc", "hackernews", "usaspending", "openfda", "clinicaltrials", "edgar", "bluesky"],
+    6: ["nsf", "nih", "cordis", "wikidata", "orcid", "usaspending"]
+  };
   var SCHOOLS = ["All", "Columbia", "NYU", "Cornell", "Cornell Tech"];
   var WINDOWS = ["2024–26", "2025–26", "2026"];
   var SORTS = ["Score", "Citations", "Papers"];
@@ -344,6 +366,13 @@
     integrations: { nicrron: true, prism: true, akta: true, roundtable: true }
   };
   MOCK.criteria = ["First-author on-thesis research", "Open-source builder", "Commercial or spinout intent"];
+  // coverage rows as /api/search returns them (status per registered source); derived from the mock signals
+  MOCK.sources = Object.keys(SRC).map(function (id) {
+    var hits = MOCK.candidates.filter(function (c) { return (c.signals || []).some(function (s) { return s.source === id; }); });
+    var n = MOCK.candidates.reduce(function (a, c) { return a + (c.signals || []).filter(function (s) { return s.source === id; }).length; }, 0);
+    var off = id === "patentsview" ? "needs PATENTSVIEW_API_KEY" : id === "sbir" ? "SBIR.gov API is down (HTTP 403, maintenance)" : null;
+    return { id: id, wave: 1, status: hits.length ? "hit" : off ? "off" : "none", reason: off || undefined, candidates: hits.length, signals: n, timeouts: 0, ms: 0 };
+  });
   MOCK.changes = { prevAt: "2026-10-24T14:10:00Z", added: ["Dana Feld"], dropped: ["Lee Park"], kept: 6 };
   MOCK.candidates[0].fit = [
     { criterion: MOCK.criteria[0], verdict: "yes", evidence: "First author on 3 of 4 diffusion protein papers, incl. NeurIPS 2026." },
@@ -424,7 +453,7 @@
   }
   function newsLi(n) { return "<li>" + link(n.url, n.title) + ' <span class="tag">' + esc([n.publisher, n.publishedDate ? String(n.publishedDate).slice(0, 10) : "", n.sentiment].filter(Boolean).join(" · ")) + "</span></li>"; }
   function grp(label, lis) { return lis.length ? '<div class="evgrp"><span class="label">' + esc(label) + "</span><ul>" + lis.join("") + "</ul></div>" : ""; }
-  function evidence(c, meter) {
+  function evidence(c, meter, cov) {
     var out = "";
     if (meter != null) {
       var m = meterData(c)[meter];
@@ -433,7 +462,17 @@
     }
     out += grp("Papers", (c.works || []).slice(0, 3).map(workLi));
     var sig = c.signals || [];
-    for (var st = 1; st <= 6; st++) out += grp(st + " " + STAGES[st], sig.filter(function (s) { return +s.stage === st; }).map(sigLi));
+    // all six stages, always: evidence when found, otherwise the sources that were checked for it
+    var reg = {};
+    (cov || []).forEach(function (x) { reg[x.id] = x; });
+    for (var st = 1; st <= 6; st++) {
+      var lis = sig.filter(function (s) { return +s.stage === st; }).map(sigLi);
+      var ids = STAGE_SRC[st].filter(function (id) { return !cov || !cov.length || reg[id]; });
+      var on = ids.filter(function (id) { return !reg[id] || reg[id].status !== "off"; }), off = ids.filter(function (id) { return reg[id] && reg[id].status === "off"; });
+      if (!lis.length) lis = ['<li class="ev-none">Nothing verified · checked ' + esc(on.map(function (id) { return SRC[id] || id; }).join(", ")) +
+        (off.length ? ' <span class="tag">' + esc(off.map(function (id) { return SRC[id] || id; }).join(", ")) + " off</span>" : "") + "</li>"];
+      out += grp(st + " " + STAGES[st], lis);
+    }
     out += grp("Press · akta.pro", (c.mentions || []).map(newsLi));
     return out || '<p class="ev-empty">No linked evidence.</p>';
   }
@@ -476,6 +515,20 @@
       chip("build", "Builders", st.build, st.build !== "Any") + chip("win", "Window", st.win, st.win !== WINDOWS[0]) + chip("sort", "Sort", st.sort, st.sort !== "Score");
     if (st.top) h += '<button type="button" class="chip on" data-act="top" aria-label="Remove top ' + st.top + ' limit">Top ' + st.top + " · clear</button>";
     return '<div class="filters" role="group" aria-label="Filters">' + h + "</div>";
+  }
+  /* every registered public API, what it returned across the shortlist (from the API's `sources` rows) */
+  function coverageStrip(d) {
+    var rows = d.sources || [];
+    if (!rows.length) return "";
+    var sum = Ranked.coverageSummary(rows);
+    var order = { hit: 0, none: 1, off: 2 };
+    var chips = rows.slice().sort(function (a, b) { return order[a.status] - order[b.status] || b.candidates - a.candidates; }).map(function (x) {
+      var title = x.status === "hit" ? x.signals + " signals for " + x.candidates + " of " + (d.candidates || []).length + " students"
+        : x.status === "off" ? "Not queried: " + (x.reason || "disabled") : "Queried for every student" + (x.timeouts ? " (" + x.timeouts + " timed out)" : "") + " · no verified match";
+      return '<span class="rk-src ' + esc(x.status) + '" title="' + esc(title) + '">' + esc(SRC[x.id] || x.id) + (x.status === "hit" ? " <b>" + x.candidates + "</b>" : "") + "</span>";
+    }).join("");
+    return '<details class="cov"><summary><span class="label">Sources</span><span><b>' + sum.checked + "</b> public APIs checked · <b>" + sum.hit + "</b> with evidence" +
+      (sum.off ? " · " + sum.off + " off" : "") + "</span><u>show all</u></summary><div class=\"cov-srcs\">" + chips + "</div></details>";
   }
   function marketStrip(d) {
     var m = (d.market || []).slice(0, 3);
@@ -532,7 +585,7 @@
       '<div class="meters">' + md.map(function (m, i) {
         return '<button type="button" class="meter' + (m.dark ? " dark" : "") + '" data-act="meter" data-k="' + i + '" aria-pressed="' + (r.meter === i) + '" title="' + esc(m.pts) + ' signal points · show evidence"><span class="label">' + esc(m.label) + '</span><span class="sqs">' + sqs(m.pts) + "</span></button>";
       }).join("") + "</div>" +
-      '<div class="ev">' + evidence(c, r.meter) + "</div>" +
+      '<div class="ev">' + evidence(c, r.meter, r.data.sources) + "</div>" +
       '<div class="actions"><details class="why"><summary>Why this rank · raw score <b>' + esc(c.score) + "</b></summary>" + why + "</details>" +
         '<span style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">' +
         (safeUrl(c.authorId) ? '<a class="btn ghost" href="' + esc(c.authorId) + '" target="_blank" rel="noopener">OpenAlex' + icon("ext", 14) + "</a>" : "") +
@@ -547,7 +600,7 @@
     var total = (d.candidates || []).length;
     var hdr = '<p class="hdr"><span><b>' + esc(d.totalWorks == null ? 0 : d.totalWorks) + "</b> papers → <b>" + total + "</b> students" + (r.ms ? " · " + (r.ms / 1000).toFixed(1) + " s" : "") + "</span>" +
       (list.length !== total ? "<span>showing " + list.length + "</span>" : "") + "<span>“" + esc(d.keywords || r.q) + "”</span>" + replayTag(d) + "</p>";
-    var html = hdr + changesLine(d) + filtersRow(r) + marketStrip(d);
+    var html = hdr + changesLine(d) + filtersRow(r) + marketStrip(d) + coverageStrip(d);
     if (!list.length) {
       html += '<div class="empty">No students match these filters. Clear a filter above or try a broader thesis.</div>';
     } else {

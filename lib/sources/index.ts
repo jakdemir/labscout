@@ -12,6 +12,8 @@ import { source as huggingface } from "./huggingface.ts";
 import { source as packages } from "./packages.ts";
 import { source as zenodo } from "./zenodo.ts";
 import { source as papercode } from "./papercode.ts";
+import { source as releases } from "./releases.ts";
+import { source as datacite } from "./datacite.ts";
 // academic / identity
 import { source as crossref } from "./crossref.ts";
 import { source as orcid } from "./orcid.ts";
@@ -20,6 +22,7 @@ import { source as cordis } from "./cordis.ts";
 import { source as wikidata } from "./wikidata.ts";
 import { source as dissertations } from "./dissertations.ts";
 import { source as nih } from "./nih.ts";
+import { source as osf } from "./osf.ts";
 // entity formation / money
 import { source as nycorp } from "./nycorp.ts";
 import { source as edgar } from "./edgar.ts";
@@ -32,8 +35,8 @@ import { source as hackernews } from "./hackernews.ts";
 
 export const SOURCES: SourceModule[] = [
   github, arxiv, semanticscholar, nsf, patentsview, sbir,
-  huggingface, packages, zenodo, papercode,
-  crossref, orcid, europepmc, cordis, wikidata, dissertations, nih,
+  huggingface, packages, zenodo, papercode, releases, datacite,
+  crossref, orcid, europepmc, cordis, wikidata, dissertations, nih, osf,
   nycorp, edgar, usaspending, clinicaltrials, yc,
   bluesky, hackernews,
 ];

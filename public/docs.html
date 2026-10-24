@@ -145,8 +145,8 @@
       <div class="fan">
         <div class="grp"><p class="label">Research data</p><div class="tags"><span class="pill ok">OpenAlex</span><span class="pill ok">ORCID</span></div></div>
         <div class="grp"><p class="label">LLM</p><div class="tags"><span class="pill hi">NicrronNinoo</span></div></div>
-        <div class="grp wide"><p class="label">Signal plugins · lib/sources/* · 24 sources, 2 waves</p><div class="tags">
-          <span class="pill ok">GitHub</span><span class="pill ok">arXiv</span><span class="pill ok">Semantic Scholar</span><span class="pill ok">Europe PMC</span><span class="pill ok">Crossref</span><span class="pill ok">ORCID</span><span class="pill ok">Wikidata</span><span class="pill ok">Dissertations</span><span class="pill ok">Hugging Face</span><span class="pill ok">Zenodo</span><span class="pill ok">NSF</span><span class="pill ok">NIH</span><span class="pill ok">CORDIS</span><span class="pill ok">NY corporations</span><span class="pill ok">SEC Form D</span><span class="pill ok">ClinicalTrials.gov</span><span class="pill ok">PyPI / npm<b>²</b></span><span class="pill ok">Paper code<b>²</b></span><span class="pill ok">USAspending<b>²</b></span><span class="pill ok">Y Combinator<b>²</b></span><span class="pill ok">Bluesky<b>²</b></span><span class="pill ok">Hacker News<b>²</b></span><span class="pill">PatentsView<b>*</b></span><span class="pill">SBIR<b>*</b></span></div></div>
+        <div class="grp wide"><p class="label">Signal plugins · lib/sources/* · 27 sources, 2 waves</p><div class="tags">
+          <span class="pill ok">GitHub</span><span class="pill ok">arXiv</span><span class="pill ok">Semantic Scholar</span><span class="pill ok">Europe PMC</span><span class="pill ok">Crossref</span><span class="pill ok">ORCID</span><span class="pill ok">Wikidata</span><span class="pill ok">Dissertations</span><span class="pill ok">Hugging Face</span><span class="pill ok">Zenodo</span><span class="pill ok">DataCite</span><span class="pill ok">OSF</span><span class="pill ok">NSF</span><span class="pill ok">NIH</span><span class="pill ok">CORDIS</span><span class="pill ok">NY corporations</span><span class="pill ok">SEC Form D</span><span class="pill ok">ClinicalTrials.gov</span><span class="pill ok">PyPI · npm · crates · CRAN · Docker<b>²</b></span><span class="pill ok">Paper code<b>²</b></span><span class="pill ok">GitHub releases<b>²</b></span><span class="pill ok">USAspending<b>²</b></span><span class="pill ok">Y Combinator<b>²</b></span><span class="pill ok">Bluesky<b>²</b></span><span class="pill ok">Hacker News<b>²</b></span><span class="pill">PatentsView<b>*</b></span><span class="pill">SBIR<b>*</b></span></div></div>
         <div class="grp"><p class="label">News</p><div class="tags"><span class="pill hi">akta.pro</span></div></div>
         <div class="grp"><p class="label">Store + traces</p><div class="tags"><span class="pill hi">Roundtable</span><span class="pill hi">PRISM</span></div></div>
       </div>
@@ -244,8 +244,8 @@ cd labscout; node scripts/dev.ts   <span class="c"># localhost:3000</span></pre>
 
   // stages (docs/SOURCES.md); s: 1 live, 0 needs key / paused
   var STAGES = [
-    { t: "Research quality", live: [["OpenAlex", 1], ["ORCID", 1], ["arXiv", 1], ["Semantic Scholar", 1], ["Europe PMC", 1], ["NIH F-fellowships", 1]], road: "OpenReview (login wall), NSF GRFP list" },
-    { t: "Builder signal", live: [["GitHub", 1], ["Paper code", 1], ["Hugging Face", 1], ["PyPI / npm", 1], ["Zenodo", 1]], road: "GitHub releases cadence" },
+    { t: "Research quality", live: [["OpenAlex", 1], ["ORCID", 1], ["arXiv", 1], ["Semantic Scholar", 1], ["Europe PMC", 1], ["OSF preprints", 1], ["NIH F-fellowships", 1]], road: "OpenReview (login wall), NSF GRFP list" },
+    { t: "Builder signal", live: [["GitHub", 1], ["GitHub releases", 1], ["Paper code", 1], ["Hugging Face", 1], ["PyPI / npm / crates / CRAN / Docker", 1], ["Zenodo", 1], ["DataCite", 1]], road: "Kaggle (key), conda" },
     { t: "Commercial pull", live: [["Crossref funders", 1], ["ORCID industry roles", 1], ["ClinicalTrials.gov", 1], ["Bluesky", 1]], road: "Lens.org, SAM.gov, standards bodies" },
     { t: "Spinout intent", live: [["NSF I-Corps / SBIR", 1], ["NIH SBIR", 1], ["NY corporations", 1], ["SEC Form D", 1], ["Dissertation deposited", 1], ["ORCID founder role", 1], ["Bluesky launch posts", 1], ["PatentsView", 0], ["SBIR.gov", 0]], road: "Co-founder co-appearance, tech-transfer portfolios", strong: 1 },
     { t: "Early traction", live: [["akta.pro news", 1], ["Y Combinator", 1], ["Hacker News", 1], ["USAspending", 1], ["Industry trials", 1]], road: "Job posts, openFDA" },
@@ -267,7 +267,7 @@ cd labscout; node scripts/dev.ts   <span class="c"># localhost:3000</span></pre>
     ["Current student (open education entry started ≤8 yrs ago, record not faculty-scale) / education ended", "ORCID", "+15 / −15", ""],
     ["Momentum: share of papers in last 2 years", "OpenAlex", "up to +10", "pos"],
     ["Established author: over 30 papers (−0.25 each), or first paper >8 years ago", "OpenAlex", "up to −40, −15", "neg"],
-    ["Founder signals: 24 sources, name + institution/paper match required", "lib/sources", "cap +15 each", "pos"],
+    ["Founder signals: 27 sources, name + institution/paper match required", "lib/sources", "cap +15 each", "pos"],
   ];
   $("rank").tBodies[0].innerHTML = RULES.map(function (r) {
     return "<tr><td>" + E(r[0]) + '</td><td class="src">' + E(r[1]) + '</td><td class="num">' + E(r[2]) + "</td></tr>";

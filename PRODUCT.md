@@ -19,4 +19,4 @@
 
 **Constraints:** zero npm dependencies, no build step, static HTML + vanilla JS, self-hosted fonts (venue Wi-Fi is unreliable), works offline via `/?mock=1`.
 
-**Data truths:** Columbia, NYU, Cornell, Cornell Tech; papers 2024–26; OpenAlex + ORCID core, 24 founder-signal sources in `lib/sources/` (22 live, PatentsView + SBIR.gov built but upstream down; catalog in `docs/SOURCES.md`), akta.pro news. Every signal needs a name match plus institution, shared paper, ORCID or handle evidence. No LinkedIn, no Google Scholar scraping, no X/Twitter.
+**Data truths:** Columbia, NYU, Cornell, Cornell Tech; papers 2024–26; OpenAlex + ORCID core, 27 founder-signal sources in `lib/sources/` (25 live, PatentsView + SBIR.gov built but upstream down; catalog in `docs/SOURCES.md`), akta.pro news. Every result lists all sources checked (hit / no match / off). Every signal needs a name match plus institution, shared paper, ORCID or handle evidence. No LinkedIn, no Google Scholar scraping, no X/Twitter.
