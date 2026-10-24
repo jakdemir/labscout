@@ -20,3 +20,20 @@ export const EXTRA_ATTENDEES: Attendee[] = [
   person("Erzsébet Ábrám", "Operator", "", "Community Architect at the residency"),
   person("Akhil A.", "Engineer", "Collectors", "Staff Security Engineer", "Security through AI adoption, M&A and IPO compliance"),
 ];
+
+/** Roster changes the registration sheet doesn't reflect yet (by exact name). team: null = left their team. */
+export const TEAM_MOVES: { name: string; team: number | null; teamName: string; theme?: string }[] = [
+  { name: "Vince", team: null, teamName: "Left team 9 (Labscout)" },
+  { name: "Siva Koneru", team: null, teamName: "Left team 9 (Labscout)" },
+  { name: "Negar Maleki", team: 9, teamName: "Labscout" },
+];
+
+export function applyMoves<T extends Pick<Attendee, "name" | "team" | "teamName" | "theme">>(people: T[]): T[] {
+  const themeOf = new Map<number, string>();
+  for (const p of people) if (p.team !== null && p.theme && !themeOf.has(p.team)) themeOf.set(p.team, p.theme);
+  return people.map((p) => {
+    const m = TEAM_MOVES.find((x) => x.name.toLowerCase() === p.name.trim().toLowerCase());
+    if (!m) return p;
+    return { ...p, team: m.team, teamName: m.teamName, theme: m.team === null ? "" : m.theme ?? themeOf.get(m.team) ?? p.theme };
+  });
+}

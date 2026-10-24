@@ -39,8 +39,8 @@ const save = () => (saving = saving.then(() => writeFile(CACHE, JSON.stringify(c
 
 const csvPath = arg("--csv", "");
 const csv = csvPath ? await readFile(csvPath, "utf8") : await (await fetch(SHEET_CSV)).text();
-const { EXTRA_ATTENDEES } = await import("../lib/hackathon-extra.ts");
-const sheet = toAttendees(parseCsv(csv));
+const { EXTRA_ATTENDEES, applyMoves } = await import("../lib/hackathon-extra.ts");
+const sheet = applyMoves(toAttendees(parseCsv(csv)));
 const sheetKeys = new Set(sheet.map((a) => a.key));
 const people = [...sheet, ...EXTRA_ATTENDEES.filter((a) => !sheetKeys.has(a.key))].slice(0, Number(arg("--limit", "100000")));
 const enabled = SOURCES.filter((s) => { try { return s.enabled(); } catch { return false; } }).map((s) => s.id);
