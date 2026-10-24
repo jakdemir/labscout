@@ -80,62 +80,6 @@
   .integ span { display: inline-flex; align-items: center; gap: 7px; }
   .next { display: flex; flex-wrap: wrap; gap: 8px; }
   .empty { border: var(--bw) dashed var(--ink); border-radius: var(--r); padding: 18px; background: var(--sheet); }
-  body.has-ranked .chat { max-width: 1180px; }
-  .rk { display: flex; flex-direction: column; gap: 28px; padding: 8px 0 12px; }
-  .rk-top, .rk-label { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; font: 500 12px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
-  .rk-top button { min-height: 44px; border: 0; background: none; padding: 0; cursor: pointer; letter-spacing: .06em; }
-  .rk-top span, .rk-label span:last-child { color: #4A4A45; }
-  .rk-hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); border: 1.5px solid #111; border-radius: 8px; overflow: hidden; text-align: left; }
-  .rk-score { padding: 20px 24px; background: #111; color: #F4F4F1; display: flex; flex-direction: column; gap: 6px; }
-  .rk-score span, .rk-score em { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #C9C9C3; font-style: normal; }
-  .rk-score div { display: flex; align-items: baseline; gap: 8px; }
-  .rk-score b { font: 600 96px/.9 var(--sans); letter-spacing: -.04em; }
-  .rk-score small { font: 400 13px/1 var(--mono); color: #C9C9C3; }
-  .rk-who, .rk-call { padding: 20px 26px; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
-  .rk-who h2, .rk-who .rk-name { margin: 0; font: 600 36px/1.05 var(--sans); letter-spacing: -.02em; display: block; }
-  .rk-who p { margin: 0; font-size: 19px; line-height: 1.35; text-wrap: pretty; }
-  .rk-chip { padding: 14px; border: 1.5px solid #111; border-radius: 6px; font: 700 17px/1.2 var(--mono); letter-spacing: .04em; text-align: center; }
-  .rk-call span, .rk-pull { font: 400 12px/1.5 var(--mono); color: #3A3A36; }
-  .rk-spot { display: block; width: 100%; border: 0; background: transparent; padding: 0; color: inherit; cursor: pointer; text-align: left; }
-  .rk-spot .rk-hero { width: 100%; }
-  .rk-pull { display: block; margin-top: 10px; letter-spacing: .06em; text-transform: uppercase; }
-  .rk-rows { display: flex; flex-direction: column; border: 1.5px solid #111; border-radius: 8px; overflow: hidden; }
-  .rk-row { border-top: 1.5px solid #111; }
-  .rk-row button { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px; width: 100%; min-height: 84px; padding: 16px 24px; }
-  .rk-row.hot button { background: #111; color: #F4F4F1; }
-  .rk-row.muted button { color: #55554F; }
-  .rk-row button:hover { background: #EAEAE6; }
-  .rk-row.hot button:hover { background: #2A2A27; }
-  .rk-stage { flex: 0 0 220px; display: flex; flex-direction: column; gap: 4px; }
-  .rk-stage b, .rk-stage small { font: 700 14px/1.2 var(--mono); letter-spacing: .04em; }
-  .rk-stage small { font-weight: 400; font-size: 11px; letter-spacing: .06em; opacity: .85; }
-  .rk-meter { flex: 1 1 320px; max-width: 420px; display: flex; align-items: center; gap: 14px; }
-  .rk-meter i { flex: 1; height: 34px; box-sizing: border-box; border: 2px solid currentColor; }
-  .rk-meter strong { flex: 0 0 44px; font: 600 26px/1 var(--sans); letter-spacing: -.02em; }
-  .rk-saw { flex: 1 1 200px; font-size: 18px; font-weight: 500; }
-  .rk-sign { flex: 0 0 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1.5px solid currentColor; border-radius: 16px; font: 400 18px/1 var(--mono); }
-  .rk-drop { padding: 4px 24px 18px; background: #FBFBF8; border-top: 1px dashed #8A8A84; }
-  .rk-ev { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding: 12px 0; border-bottom: 1px dashed #B5B5AE; }
-  .rk-ev span:first-child { flex: 0 0 72px; font: 400 12px/1.3 var(--mono); color: #4A4A45; }
-  .rk-ev span:nth-child(2) { flex: 1 1 280px; font-size: 16px; line-height: 1.35; }
-  .rk-ev b { font: 500 11px/1 var(--mono); letter-spacing: .04em; padding: 5px 9px; border: 1.5px solid #111; border-radius: 4px; }
-  .rk-split { display: flex; flex-wrap: wrap; gap: 20px; }
-  .rk-velocity { flex: 999 1 520px; min-height: 280px; border: 1.5px solid #111; border-radius: 8px; padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; }
-  .rk-months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; align-items: end; flex: 1; }
-  .rk-month { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; }
-  .rk-month i { width: 70%; max-width: 28px; height: 20px; box-sizing: border-box; border: 1.5px solid #111; background: transparent; }
-  .rk-month i.on { background: #111; }
-  .rk-month span { width: 100%; padding-top: 4px; border-top: 1.5px solid #111; font: 400 11px/1 var(--mono); color: #4A4A45; text-align: center; }
-  .rk-partner { flex: 1 1 340px; border: 1.5px dashed #111; border-radius: 8px; padding: 18px 22px; display: flex; flex-direction: column; gap: 10px; }
-  .rk-partner fieldset { margin: 0; padding: 0; border: 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
-  .rk-partner legend { float: left; padding: 0; font-size: 15px; }
-  .rk-partner fieldset div, .rk-calls { display: flex; gap: 12px; }
-  .rk-partner fieldset button { border: 0; background: none; padding: 0; cursor: pointer; font: 500 11px/1 var(--mono); letter-spacing: .04em; }
-  .rk-partner fieldset button[aria-pressed="true"] { background: var(--hi); }
-  .rk-calls { margin-top: auto; padding-top: 8px; gap: 8px; }
-  .rk-calls button { flex: 1; height: 44px; border: 1.5px solid #111; border-radius: 22px; background: transparent; font: 600 15px/1 var(--sans); cursor: pointer; }
-  .rk-calls button[data-call="meet"], .rk-calls button[aria-pressed="true"] { background: #111; color: #F4F4F1; }
-  @media (max-width: 720px) { .rk-score b { font-size: 72px; } .rk-who h2 { font-size: 28px; } .rk-stage { flex-basis: 100%; } .rk-months { gap: 3px; } }
   .load-anim { display: grid; justify-items: center; gap: 12px; width: 100%; padding: 12px 0 4px; text-align: center; }
   .load-anim .eyebrow { margin: 0; font: 500 9px/1 var(--mono); letter-spacing: 1.8px; color: #6a685f; }
   .load-anim h2 { margin: 0; max-width: 16em; min-height: 2.3em; font-family: "Iowan Old Style", Baskerville, "Palatino Linotype", Georgia, serif; font-size: clamp(28px, 4vw, 46px); font-weight: 400; letter-spacing: -.035em; line-height: 1.15; }
@@ -602,13 +546,6 @@
     var total = (d.candidates || []).length;
     var hdr = '<p class="hdr"><span><b>' + esc(d.totalWorks == null ? 0 : d.totalWorks) + "</b> papers → <b>" + total + "</b> students" + (r.ms ? " · " + (r.ms / 1000).toFixed(1) + " s" : "") + "</span>" +
       (list.length !== total ? "<span>showing " + list.length + "</span>" : "") + "<span>“" + esc(d.keywords || r.q) + "”</span>" + replayTag(d) + "</p>";
-    document.body.classList.add("has-ranked");
-    if (list.length && r.pulled) {
-      var picked = list[r.sel];
-      var mail = r.mail === r.sel ? esc(emailText(picked, d.keywords || r.q)).replace(/\n/g, "<br>") + '<button type="button" class="copy-btn" data-act="copymail"><span>Copy email</span></button>' : "";
-      r.el.innerHTML = Ranked.scorecard(picked, { rank: r.sel, score: norm(r, picked), now: Date.now(), refreshed: r.at || Date.now(), open: r.openStages || { "04": true }, partner: r.partner || {}, mail: mail });
-      return;
-    }
     var html = hdr + changesLine(d) + filtersRow(r) + marketStrip(d);
     if (!list.length) {
       html += '<div class="empty">No students match these filters. Clear a filter above or try a broader thesis.</div>';
@@ -621,7 +558,7 @@
           '<button type="button" class="ftab settle" style="--i:' + (n - 1 - k) + '" role="tab" id="tab-' + r.id + "-" + k + '" data-k="' + k + '" aria-selected="' + sel + '" aria-controls="open-' + r.id + '" tabindex="' + (sel ? 0 : -1) + '" title="Rank ' + (k + 1) + ": " + esc(c.name) + ", raw score " + esc(c.score) + '">' +
           '<span class="id">' + pad(k + 1) + '</span><span class="nm">' + esc(short(c.name)) + "</span><b>" + norm(r, c) + "</b></button></div>";
       }
-      html += '<div class="stack" role="tablist" aria-label="Ranked students">' + rows + "</div>" + Ranked.spotlight(list[r.sel], { rank: r.sel, score: norm(r, list[r.sel]), now: Date.now(), refreshed: r.at || Date.now() });
+      html += '<div class="stack" role="tablist" aria-label="Ranked students">' + rows + "</div>" + openCard(r, list[r.sel], r.sel);
     }
     html += '<div class="drawer"><span class="tag-hi">student watchlist · ' + esc(d.keywords || r.q) + '</span><span class="handle" aria-hidden="true"></span></div>';
     var after = [];
@@ -940,27 +877,7 @@
     if (!r) return;
     var c = r.list && r.list[r.sel];
     if (t.classList.contains("ftab")) { selectTab(r, +t.getAttribute("data-k"), true); return; }
-    if (act === "pull") { r.pulled = true; r.openStages = r.openStages || { "04": true }; }
-    else if (act === "drawer") r.pulled = false;
-    else if (act === "stage") {
-      var stage = t.getAttribute("data-stage");
-      var nextOpen = Object.assign({}, r.openStages || { "04": true });
-      nextOpen[stage] = !nextOpen[stage];
-      r.openStages = nextOpen;
-    }
-    else if (act === "trait") {
-      var prevPartner = r.partner || { traits: {}, call: "" };
-      var traits = Object.assign({}, prevPartner.traits);
-      traits[t.getAttribute("data-key")] = t.getAttribute("data-level");
-      r.partner = { traits: traits, call: prevPartner.call };
-    }
-    else if (act === "call") {
-      var prevCall = r.partner || { traits: {}, call: "" };
-      var call = t.getAttribute("data-call");
-      r.partner = { traits: Object.assign({}, prevCall.traits), call: call };
-      r.mail = call === "meet" ? r.sel : null;
-    }
-    else if (act === "school") r.st.school = cycle(SCHOOLS, r.st.school);
+    if (act === "school") r.st.school = cycle(SCHOOLS, r.st.school);
     else if (act === "status") r.st.status = cycle(STATUS, r.st.status);
     else if (act === "build") r.st.build = cycle(BUILD, r.st.build);
     else if (act === "win") r.st.win = cycle(WINDOWS, r.st.win);
@@ -972,7 +889,7 @@
     else if (act === "copymail") { if (c) copy(emailText(c, r.data.keywords || r.q), t, "Copy email"); return; }
     else if (act === "memo") { exportMemo(r); return; }
     else return;
-    if (/school|status|build|win|sort|top/.test(act || "")) { r.sel = 0; r.meter = null; r.mail = null; r.pulled = false; }
+    if (/school|status|build|win|sort|top/.test(act)) { r.sel = 0; r.meter = null; r.mail = null; }
     var focusAct = act, focusK = t.getAttribute("data-k");
     renderDrawer(r);
     var again = r.el.querySelector('[data-act="' + focusAct + '"]' + (focusK != null ? '[data-k="' + focusK + '"]' : ""));
@@ -1007,7 +924,7 @@
   resetBtn.addEventListener("click", function () {
     if (busy) return;
     replies = []; lastQ = ""; thread.innerHTML = "";
-    document.body.classList.remove("has-thread", "has-ranked"); resetBtn.hidden = true; input.rows = 2;
+    document.body.classList.remove("has-thread"); resetBtn.hidden = true; input.rows = 2;
     sourceNotice.hidden = true; picker.hidden = true;
     placeholder(); window.scrollTo(0, 0); input.focus();
   });
