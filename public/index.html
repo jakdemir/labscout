@@ -91,6 +91,7 @@
   .load-anim .detail { margin: 0; min-height: 1.2em; font: 400 12px/1.4 var(--mono); color: var(--ink-2); }
   .load-anim .detail:empty { display: none; }
   body.is-loading .msg-u { display: none; }
+  body.is-loading .msg-a:has(> .thesis-card) { display: none; }
   body.is-loading .thread { min-height: calc(100svh - 128px); }
   body.is-loading .msg-a { width: 100%; margin-top: auto; margin-bottom: auto; }
 
