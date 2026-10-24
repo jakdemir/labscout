@@ -17,6 +17,7 @@ const { SHEET_CSV, parseCsv, toAttendees, candidateFor, contextFor, strictSignal
 const { collectSignals } = await import("../lib/search.ts");
 const { writeAttendeeBrief } = await import("../lib/llm.ts");
 const { SOURCES } = await import("../lib/sources/index.ts");
+const { MAX: MODEL } = await import("../lib/rank.ts");
 
 const arg = (k: string, d: string) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
 const CONC = Number(arg("--concurrency", "8"));
@@ -113,6 +114,7 @@ const ranked = build();
 const payload = {
   event: "Deal Flow — NYC VC Hackathon 2026", generatedAt: new Date().toISOString(),
   sheet: SHEET_CSV.replace(/\/export\?.*$/, "/edit"), sources: enabled,
+  model: MODEL, // component caps for the score breakdown (lib/rank.ts)
   count: ranked.length, withSignals: ranked.filter((p) => p.signals.length > 0).length,
   teams: rankTeams(ranked), attendees: ranked,
 };

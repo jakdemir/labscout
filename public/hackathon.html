@@ -42,6 +42,16 @@
   .det .links { display: flex; gap: 14px; flex-wrap: wrap; font: 400 12.5px var(--mono); }
   .det .links a { display: inline-flex; gap: 5px; align-items: center; }
   .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .comp { display: grid; grid-template-columns: 120px minmax(0, 260px) 64px; gap: 6px 12px; align-items: center; font: 400 12px/1.2 var(--mono); }
+  .comp .k { text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); }
+  .comp .k em { font-style: normal; color: var(--ink-3); text-transform: none; letter-spacing: 0; }
+  .comp .b { height: 10px; border: var(--bw) solid var(--ink); border-radius: 3px; background: var(--paper); overflow: hidden; }
+  .comp .b i { display: block; height: 100%; background: var(--ink); }
+  .comp .b.self i { background: var(--ink-3); }
+  .comp .v { text-align: right; font-variant-numeric: tabular-nums; }
+  .tier { display: inline-block; min-width: 22px; text-align: center; font: 700 11px/18px var(--mono); border: var(--bw) solid var(--ink); border-radius: 4px; margin-right: 6px; }
+  .tier.A { background: var(--hi); }
+  .tier.D { color: var(--ink-3); border-color: var(--ink-3); }
 
   .teams .row > details > summary { grid-template-columns: 56px minmax(0, 1fr) minmax(0, 1.6fr) 96px 72px; }
   .empty { padding: 28px 18px; color: var(--ink-2); font: 400 13px var(--mono); }
@@ -83,7 +93,7 @@
   </div>
   <div class="bar" id="pfilters">
     <div class="grp" role="group" aria-label="Type" id="types"></div>
-    <button class="chip" type="button" id="evonly" aria-pressed="false">Evidence only</button>
+    <button class="chip" type="button" id="evonly" aria-pressed="false">Verified evidence only</button>
   </div>
   <p class="meta" id="meta"></p>
 
@@ -96,7 +106,10 @@
       <li>GitHub identity first: an account whose public email matches the registration, or whose handle and name match the LinkedIn slug.</li>
       <li>Then the same founder-signal sources as Scout: GitHub, Hugging Face, PyPI/npm, Hacker News, YC, ORCID, NSF, NIH, arXiv, SEC Form D, NY corporations and more.</li>
       <li>Strict matching. Common names (25+ ORCID namesakes) keep only handle-verified evidence. Company registries count only when the filing names the attendee&rsquo;s own company.</li>
-      <li>Score = sum of signal weights, capped at 15 per source. Same scorer as Scout, no seniority penalty. No evidence = 0, not &ldquo;bad&rdquo;.</li>
+      <li>Score is 0&ndash;100 from six capped components. <b>Verified public evidence: 65.</b> Builder (35): GitHub repos scored by log stars + forks, weighted by recency (last push &le; 90 days 1.0, &le; 1 year 0.7, older 0.4), plus packages by log downloads and language range. Traction (15): grants, filings, launches, YC, weighted by founder-signal stage. Identity (15): GitHub verified by registration email or LinkedIn handle (10) or by name + affiliation (6), other profiles, LinkedIn.</li>
+      <li><b>Self-reported roster fields: 30</b>, shown in grey. Role (20): founder / CEO / CTO 17, senior or founding builder 13, researcher 12, engineer 11, product 9, student 8, investor 6, plus 2 for an AI/ML title. Skills (10): weighted, plus 2 for a builder + go-to-market mix.</li>
+      <li>Team (5): average verified evidence of your teammates, scaled to the strongest team.</li>
+      <li>Every component saturates (diminishing returns), so one viral repo cannot dominate. Tiers come from rank percentile. Hover a rank for the percentile, click a row for each component&rsquo;s points.</li>
       <li>Team score = sum of the top 3 member scores.</li>
     </ol>
   </section>
@@ -126,22 +139,33 @@
         var u = url(s.url);
         return '<li><span class="src">' + esc(s.source) + "</span>" + (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(s.label) + "</a>" : '<span class="l">' + esc(s.label) + "</span>") + "</li>";
       }).join("") + "</ul>" : '<p class="muted" style="margin:0">No public founder signals matched' + (p.commonName ? " (common name: only handle-verified sources count)" : "") + ".</p>") +
+      compBars(p) +
       ((p.reasons || []).length ? '<div class="why">' + p.reasons.map(esc).join("<br>") + "</div>" : "") +
       '<div class="tags">' + (p.skills || []).map(function (s) { return '<span class="pill">' + esc(s) + "</span>"; }).join("") + (p.commonName ? '<span class="pill">common name · strict</span>' : "") + "</div>" +
       '<div class="links">' + (li ? '<a href="' + esc(li) + '" target="_blank" rel="noopener">LinkedIn' + LS.icon("ext", 13) + "</a>" : "") + "</div>" +
       "</div>";
-    return '<li class="row' + (p.score > 0 ? "" : " zero") + '"><details><summary>' +
-      '<span class="rk" title="' + (p.score > 0 ? "Rank " + esc(p.rank) + " of " + D.attendees.length + " (ties share a rank)" : "Unranked: no verifiable public evidence found") + '">' + (p.score > 0 ? esc(p.rank) : "–") + "</span>" +
+    return '<li class="row"><details><summary>' +
+      '<span class="rk" title="Rank ' + esc(p.rank) + " of " + D.attendees.length + " · top " + esc(100 - p.percentile + 1) + "% · tier " + esc(p.tier) + ' (ties share a rank)">' + esc(p.rank) + "</span>" +
       '<span class="who"><b>' + esc(p.name) + "</b><span>" + (p.team == null ? "" : "Team " + esc(p.team) + " · ") + esc(p.teamName) + "</span></span>" +
       '<span class="org"><b>' + esc(p.title || "–") + "</b><span>" + esc(p.org || "–") + "</span></span>" +
       '<span class="ty"><span class="pill">' + esc(p.type || "–") + "</span></span>" +
-      '<span class="sc">' + esc(p.score) + "<small>" + sig.length + " signal" + (sig.length === 1 ? "" : "s") + "</small></span>" +
+      '<span class="sc">' + esc(p.score) + "<small><span class=\"tier " + esc(p.tier) + '">' + esc(p.tier) + "</span>" + sig.length + " sig</small></span>" +
       "</summary>" + det + "</details></li>";
+  }
+
+  var COMP = [["builder", "Builder", 0], ["traction", "Traction", 0], ["identity", "Identity", 0], ["role", "Role", 1], ["skills", "Skills", 1], ["team", "Team", 0]];
+  function evidence(p) { var c = p.components || {}; return (c.builder || 0) + (c.traction || 0) + (c.identity || 0); }
+  function compBars(p) {
+    var c = p.components || {}, M = D.model || {};
+    return '<div class="comp" role="list" aria-label="Score breakdown">' + COMP.map(function (x) {
+      var v = +c[x[0]] || 0, max = +M[x[0]] || 1;
+      return '<span class="k">' + x[1] + (x[2] ? " <em>self</em>" : "") + '</span><span class="b' + (x[2] ? " self" : "") + '"><i style="width:' + Math.round(100 * v / max) + '%"></i></span><span class="v">' + v + " / " + max + "</span>";
+    }).join("") + "</div>";
   }
 
   function teamRow(t, i, members) {
     var det = '<div class="det"><p style="margin:0">' + esc(t.theme || "") + "</p><ul>" + members.map(function (p) {
-      return '<li><span class="src">' + (p.score > 0 ? "#" + esc(p.rank) : "unranked") + " · " + esc(p.score) + '</span><span class="l">' + esc(p.name) + " — " + esc(p.title || p.type || "") + (p.org ? ", " + esc(p.org) : "") + "</span></li>";
+      return '<li><span class="src">' + "#" + esc(p.rank) + " · " + esc(p.score) + " · " + esc(p.tier) + '</span><span class="l">' + esc(p.name) + " — " + esc(p.title || p.type || "") + (p.org ? ", " + esc(p.org) : "") + "</span></li>";
     }).join("") + "</ul></div>";
     return '<li class="row' + (t.score > 0 ? "" : " zero") + '"><details><summary>' +
       '<span class="rk">' + (i + 1) + "</span>" +
@@ -160,9 +184,9 @@
     list.classList.toggle("teams", view === "teams");
     if (view === "people") {
       var ps = D.attendees.filter(function (p) {
-        return (type === "All" || p.type === type) && (!evOnly || p.score > 0) && (!q || hay(p).indexOf(q) >= 0);
+        return (type === "All" || p.type === type) && (!evOnly || evidence(p) > 0) && (!q || hay(p).indexOf(q) >= 0);
       });
-      $("#meta").textContent = ps.length + " of " + D.attendees.length + " shown · # = rank, ties share a rank · – = no verifiable public evidence (score 0) · click a row for evidence";
+      $("#meta").textContent = ps.length + " of " + D.attendees.length + " shown · score 0–100 · tier A = top 5%, B = next 15%, C = next 30%, D = rest · ties share a rank · click a row for the breakdown";
       list.innerHTML = ps.length ? ps.map(personRow).join("") : '<li class="empty">No attendees match.</li>';
     } else {
       var by = {};

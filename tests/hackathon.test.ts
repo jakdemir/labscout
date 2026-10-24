@@ -86,16 +86,16 @@ test("pickAuthor needs name + affiliation, and a unique match", () => {
   assert.equal(pickAuthor(c, [nyu, { ...nyu }]), null);
 });
 
-test("rankAttendees: strips email, ranks by score, ties share a rank", () => {
+test("rankAttendees: strips email, verified evidence outranks self-reported role, components add up", () => {
   const ppl = toAttendees(parseCsv(CSV));
   const items = ppl.map((a, i) => { const c = candidateFor(a); c.signals = i === 1 ? [sig("github", "GitHub @aadit", 9)] : []; return { a, c }; });
   const r = rankAttendees(items);
   assert.equal(r[0].name, "Aadit Fadia");
-  assert.equal(r[0].score, 9);
-  assert.deepEqual(r.map((x) => x.rank), [1, 2, 2]);
+  assert.ok(r[0].components.builder > 0);
+  assert.deepEqual(r.map((x) => x.rank), [1, 2, 3]);
   assert.ok(r.every((x) => !("email" in x)));
-  assert.ok(!r[0].reasons.some((x) => x.startsWith("0 matching papers")));
+  for (const x of r) assert.equal(x.score, Math.round(Object.values(x.components).reduce((a, b) => a + b, 0) * 10) / 10);
+  assert.ok(r.every((x) => x.reasons.some((y) => y.startsWith("role (self-reported)"))));
   const t = rankTeams(r);
   assert.equal(t[0].team, 2);
-  assert.equal(t[0].score, 9);
 });

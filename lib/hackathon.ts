@@ -2,7 +2,7 @@
 // same founder-signal score the Scout tab uses. Pure helpers here; the batch runner is scripts/hackathon.ts.
 import type { Candidate, Work } from "./types.ts";
 import type { Signal } from "./sources/types.ts";
-import { score } from "./score.ts";
+import { rankPeople, type Components } from "./rank.ts";
 import { namesMatch, mentionsInstitution } from "./sources/match.ts";
 import { QUERY as GH_QUERY, toSignals as ghSignals, type GhUser } from "./sources/github.ts";
 
@@ -24,7 +24,10 @@ export type Attendee = {
 
 export type RankedAttendee = Omit<Attendee, "email"> & {
   rank: number;
-  score: number;
+  score: number;                 // 0-100 composite (lib/rank.ts)
+  components: Components;        // builder / traction / identity / role / skills / team points
+  tier: "A" | "B" | "C" | "D";   // top 5% / next 15% / next 30% / rest
+  percentile: number;
   reasons: string[];
   signals: Signal[];
   openalex: { id: string; works: number; citations: number; papers: Work[] } | null;
@@ -215,18 +218,14 @@ export function pickAuthor(c: Candidate, authors: any[]): any | null {
   return ok.length === 1 ? ok[0] : null;
 }
 
-/** Score with the shared Scout scorer. worksCount / firstPubYear stay null so seniority penalties
- *  (built for "is this a student?") don't punish experienced builders here. */
-export function rankAttendees(items: { a: Attendee; c: Candidate; brief?: string | null; openalex?: RankedAttendee["openalex"]; commonName?: boolean }[]): RankedAttendee[] {
-  const scored = items.map(({ a, c, brief, openalex, commonName }) => {
-    const s = score(c);
+/** Rank with the multi-factor hackathon model (lib/rank.ts): verified builder / traction / identity evidence plus
+ *  self-reported role and skills and team context. Every component is capped and explained in `reasons`. */
+export function rankAttendees(items: { a: Attendee; c: Candidate; brief?: string | null; openalex?: RankedAttendee["openalex"]; commonName?: boolean }[], now = Date.now()): RankedAttendee[] {
+  const ranked = rankPeople(items.map(({ a, c, brief, openalex, commonName }) => {
     const { email: _drop, ...pub } = a;
-    return { ...pub, rank: 0, score: s, reasons: c.reasons.filter((r) => !/^0 matching papers/.test(r)), signals: c.signals, openalex: openalex ?? null, commonName: !!commonName, brief: brief ?? null };
-  });
-  scored.sort((x, y) => y.score - x.score || y.signals.length - x.signals.length || x.name.localeCompare(y.name));
-  let prev = NaN;
-  scored.forEach((r, i) => { r.rank = r.score === prev ? scored[i - 1].rank : i + 1; prev = r.score; });
-  return scored;
+    return { ...pub, signals: c.signals, openalex: openalex ?? null, commonName: !!commonName, brief: brief ?? null };
+  }), now);
+  return ranked;
 }
 
 export type TeamRow = { team: number; teamName: string; theme: string; members: number; score: number; top: string; withSignals: number };
