@@ -131,8 +131,8 @@
       '<div class="links">' + (li ? '<a href="' + esc(li) + '" target="_blank" rel="noopener">LinkedIn' + LS.icon("ext", 13) + "</a>" : "") + "</div>" +
       "</div>";
     return '<li class="row' + (p.score > 0 ? "" : " zero") + '"><details><summary>' +
-      '<span class="rk">' + esc(p.rank) + "</span>" +
-      '<span class="who"><b>' + esc(p.name) + "</b><span>Team " + esc(p.team == null ? "–" : p.team) + " · " + esc(p.teamName) + "</span></span>" +
+      '<span class="rk" title="' + (p.score > 0 ? "Rank " + esc(p.rank) + " of " + D.attendees.length + " (ties share a rank)" : "Unranked: no verifiable public evidence found") + '">' + (p.score > 0 ? esc(p.rank) : "–") + "</span>" +
+      '<span class="who"><b>' + esc(p.name) + "</b><span>" + (p.team == null ? "" : "Team " + esc(p.team) + " · ") + esc(p.teamName) + "</span></span>" +
       '<span class="org"><b>' + esc(p.title || "–") + "</b><span>" + esc(p.org || "–") + "</span></span>" +
       '<span class="ty"><span class="pill">' + esc(p.type || "–") + "</span></span>" +
       '<span class="sc">' + esc(p.score) + "<small>" + sig.length + " signal" + (sig.length === 1 ? "" : "s") + "</small></span>" +
@@ -141,7 +141,7 @@
 
   function teamRow(t, i, members) {
     var det = '<div class="det"><p style="margin:0">' + esc(t.theme || "") + "</p><ul>" + members.map(function (p) {
-      return '<li><span class="src">#' + esc(p.rank) + " · " + esc(p.score) + '</span><span class="l">' + esc(p.name) + " — " + esc(p.title || p.type || "") + (p.org ? ", " + esc(p.org) : "") + "</span></li>";
+      return '<li><span class="src">' + (p.score > 0 ? "#" + esc(p.rank) : "unranked") + " · " + esc(p.score) + '</span><span class="l">' + esc(p.name) + " — " + esc(p.title || p.type || "") + (p.org ? ", " + esc(p.org) : "") + "</span></li>";
     }).join("") + "</ul></div>";
     return '<li class="row' + (t.score > 0 ? "" : " zero") + '"><details><summary>' +
       '<span class="rk">' + (i + 1) + "</span>" +
@@ -162,7 +162,7 @@
       var ps = D.attendees.filter(function (p) {
         return (type === "All" || p.type === type) && (!evOnly || p.score > 0) && (!q || hay(p).indexOf(q) >= 0);
       });
-      $("#meta").textContent = ps.length + " of " + D.attendees.length + " shown · ties share a rank · click a row for evidence";
+      $("#meta").textContent = ps.length + " of " + D.attendees.length + " shown · # = rank, ties share a rank · – = no verifiable public evidence (score 0) · click a row for evidence";
       list.innerHTML = ps.length ? ps.map(personRow).join("") : '<li class="empty">No attendees match.</li>';
     } else {
       var by = {};
