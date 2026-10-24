@@ -260,12 +260,13 @@ cd labscout; node scripts/dev.ts   <span class="c"># localhost:3000</span></pre>
 
   // ranking rules (lib/score.ts)
   var RULES = [
-    ["Matching paper, first / middle / last author", "OpenAlex", "+10 / +3 / +1", "pos"],
+    ["Matching paper, first / middle / last author", "OpenAlex", "+10 / +3 / +1 (papers total capped at +45)", "pos"],
     ["Citations per paper (0.25 each, max 20)", "OpenAlex", "up to +5", "pos"],
     ["Paper published 2025 or later", "OpenAlex", "+2", "pos"],
-    ["Current student / education ended", "ORCID", "+15 / −15", ""],
+    ["Senior/corresponding author on 2+ papers, first on none (PI proxy)", "OpenAlex", "−10", "neg"],
+    ["Current student (open education entry started ≤8 yrs ago, record not faculty-scale) / education ended", "ORCID", "+15 / −15", ""],
     ["Momentum: share of papers in last 2 years", "OpenAlex", "up to +10", "pos"],
-    ["Established author: over 30 papers, or publishing before 2018", "OpenAlex", "up to −20, −10", "neg"],
+    ["Established author: over 30 papers (−0.25 each), or first paper >8 years ago", "OpenAlex", "up to −40, −15", "neg"],
     ["Founder signals: 24 sources, name + institution/paper match required", "lib/sources", "cap +15 each", "pos"],
   ];
   $("rank").tBodies[0].innerHTML = RULES.map(function (r) {

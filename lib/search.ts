@@ -1,6 +1,6 @@
-import { aggregate } from "./aggregate.ts";
+import { aggregate, shortlist } from "./aggregate.ts";
 import { score, isCurrentStudent } from "./score.ts";
-import { searchWorks, getAuthor } from "./openalex.ts";
+import { searchWorks, getAuthors } from "./openalex.ts";
 import { getEducation } from "./orcid.ts";
 import { parseQuery, writeBrief, checkFit, sessionFor } from "./llm.ts";
 import { cleanCriteria } from "./fit.ts";
@@ -54,12 +54,20 @@ export async function runSearch(q: string, criteriaIn: unknown = []): Promise<Se
   const candidates = aggregate(works);
   candidates.forEach((c) => (c.score = score(c)));
   candidates.sort((a, b) => b.score - a.score);
-  const top = candidates.slice(0, 15);
-  await Promise.all(top.map(async (c) => {
-    const [author, education] = await Promise.all([getAuthor(c.authorId), getEducation(c.orcid)]);
-    Object.assign(c, author, { education, isCurrentStudent: isCurrentStudent(education) });
+  // Per-institution works fetch (lib/openalex.ts) so one dominant school can't fill the pool; the shortlist keeps
+  // ≥5 seats per campus family (Cornell+Cornell Tech = one) for enrichment; the final 10 are pure score.
+  const top = shortlist(candidates, 20, 5);
+  // Author stats for all 20 in ONE OpenAlex call (rate budget), ORCID education per candidate in parallel.
+  const [stats, educations] = await Promise.all([
+    getAuthors(top.map((c) => c.authorId)),
+    Promise.all(top.map((c) => getEducation(c.orcid))),
+  ]);
+  top.forEach((c, i) => {
+    const author = stats.get(c.authorId.replace("https://openalex.org/", "")) ?? {};
+    const education = educations[i];
+    Object.assign(c, author, { education, isCurrentStudent: isCurrentStudent(education, { worksCount: c.worksCount, firstPubYear: c.firstPubYear, ...author }) });
     c.score = score(c);
-  }));
+  });
   top.sort((a, b) => b.score - a.score);
   // Founder signals (GitHub, arXiv, NSF, ...): every enabled source on each of the top 10, all in parallel.
   await collectSignals(top.slice(0, 10), { query: q, keywords });

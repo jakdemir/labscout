@@ -9,8 +9,8 @@ Built at **Deal Flow — NYC's first VC hackathon** (Betaworks, October 24, 2026
 ## How it works
 
 - **Thesis → keywords:** Claude (via Nicrron) turns the plain-English thesis into search keywords.
-- **Search:** OpenAlex works search, filtered to Columbia / NYU / Cornell / Cornell Tech, publication years 2024–26.
-- **Enrich:** per-author aggregation of matching papers + OpenAlex author stats + ORCID education check (an education entry with no end date = current student).
+- **Search:** OpenAlex works search, one query per campus (Columbia / NYU / Cornell / Cornell Tech, publication years 2024–26), merged — so a school that dominates a topic cannot fill the whole pool. The enrichment shortlist (20) keeps ≥5 seats per campus family (Cornell + Cornell Tech count as one); the final 10 are ranked purely by score.
+- **Enrich:** per-author aggregation of matching papers + OpenAlex author stats (one batched call) + ORCID education check (an open education entry started ≤8 years ago = current student, unless the publication record is faculty-scale). Works points are capped and a last/corresponding-author PI proxy applies, so established PIs don't out-rank their students.
 - **Rank & brief:** deterministic score, then a 3-line brief per student with links to every source paper.
 - **Thesis fit:** upload your fund's thesis (PDF/TXT/MD). Labscout pulls up to 4 criteria from it and checks every student against each: yes / partial / no, with the evidence line. Fit points show in the score breakdown.
 - **Since last run:** every shortlist is versioned in Roundtable; re-running a thesis shows who is new and who dropped.
@@ -25,7 +25,7 @@ Built at **Deal Flow — NYC's first VC hackathon** (Betaworks, October 24, 2026
 
 ## Run locally
 
-1. Create `.env.local` with `NICRRON_API_KEY` and `OPENALEX_MAILTO`.
+1. Create `.env.local` with `NICRRON_API_KEY`, `OPENALEX_MAILTO` and `OPENALEX_API_KEY` (free key, own $1/day budget — without it OpenAlex's per-IP daily budget is shared with everyone on the same network and runs out: `POST https://api.openalex.org/api-keys {"email"}`, click the activation mail).
 2. `node scripts/dev.ts` → http://localhost:3000
 3. Tests: `node --test tests/`
 4. Hackathon tab data: `node scripts/hackathon.ts` re-pulls the attendee sheet, runs every attendee through the signal sources (resumable cache in `.cache/`) and writes `public/data/hackathon.json`. Flags: `--fresh`, `--briefs N`, `--openalex`, `--limit N`.

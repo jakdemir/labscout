@@ -25,7 +25,7 @@ const BRIEFS = Number(arg("--briefs", "25"));
 const CACHE = new URL("../.cache/hackathon.json", import.meta.url);
 const OUT = new URL("../public/data/hackathon.json", import.meta.url);
 const OA = "https://api.openalex.org";
-const mailto = process.env.OPENALEX_MAILTO ? `&mailto=${process.env.OPENALEX_MAILTO}` : "";
+const mailto = (process.env.OPENALEX_MAILTO ? `&mailto=${process.env.OPENALEX_MAILTO}` : "") + (process.env.OPENALEX_API_KEY ? `&api_key=${process.env.OPENALEX_API_KEY}` : "");
 
 type Entry = { signals: any[]; works: any[]; openalex: any; nameCount: number | null; brief?: string | null; at: string };
 const USE_OPENALEX = process.argv.includes("--openalex");

@@ -1,4 +1,4 @@
-import { NYC_INSTITUTIONS } from "./institutions.ts";
+import { NYC_INSTITUTIONS, familyOf } from "./institutions.ts";
 import type { Candidate, Work } from "./types.ts";
 
 export function aggregate(works: any[]): Candidate[] {
@@ -29,4 +29,26 @@ export function aggregate(works: any[]): Candidate[] {
     }
   }
   return [...byAuthor.values()];
+}
+
+/** Enrichment shortlist: the top `n` by pre-score, but every campus family that has candidates keeps at least
+ *  `minPer` seats (lowest-ranked overall are displaced). Cornell + Cornell Tech count as one family. Guards the
+ *  pool, not the final order: the final top 10 is still sorted purely by score. Input must be sorted. */
+export function shortlist(sorted: Candidate[], n = 15, minPer = 3): Candidate[] {
+  if (sorted.length <= n) return sorted.slice();
+  const picked = sorted.slice(0, n);
+  const fams = (c: Candidate) => [...new Set(c.institutions.map(familyOf))];
+  const count = (list: Candidate[], fam: string) => list.filter((c) => fams(c).includes(fam)).length;
+  const families = [...new Set(sorted.flatMap(fams))];
+  for (const fam of families) {
+    const pool = sorted.filter((c) => fams(c).includes(fam) && !picked.includes(c));
+    while (count(picked, fam) < minPer && pool.length) {
+      // displace the lowest-ranked pick whose families all stay above their minimum without it
+      const victim = [...picked].reverse().find((c) => !fams(c).includes(fam) && fams(c).every((f) => count(picked, f) > minPer));
+      if (!victim) break;
+      picked.splice(picked.indexOf(victim), 1);
+      picked.push(pool.shift()!);
+    }
+  }
+  return picked.sort((a, b) => b.score - a.score);
 }

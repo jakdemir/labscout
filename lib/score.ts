@@ -2,11 +2,20 @@ import type { Candidate, Education } from "./types.ts";
 import type { Signal } from "./sources/types.ts";
 import { fitPoints } from "./fit.ts";
 
-export function isCurrentStudent(edu: Education[]): boolean | null {
+/** ORCID education with no end date = enrolled now — unless the entry started >8 years ago (people leave
+ *  end dates blank) or the publication record is faculty-scale (a 700-paper PI with an open "PhD" entry is
+ *  not a current student). `author` is optional so callers without OpenAlex stats keep the plain rule. */
+export function isCurrentStudent(edu: Education[], author?: { worksCount: number | null; firstPubYear: number | null }): boolean | null {
   if (edu.length === 0) return null;
-  return edu.some((e) => e.endYear === null);
+  const nowY = new Date().getFullYear();
+  const open = edu.filter((e) => e.endYear === null && (e.startYear === null || e.startYear >= nowY - 8));
+  if (!open.length) return false;
+  if (author && ((author.worksCount ?? 0) > FACULTY_WORKS || (author.firstPubYear !== null && author.firstPubYear < nowY - 12))) return false;
+  return true;
 }
 
+export const FACULTY_WORKS = 60;
+const WORKS_PTS_CAP = 45;
 const POS: Record<string, number> = { first: 10, middle: 3, last: 1 };
 
 /** Deterministic, explainable score. Returns the number and fills c.reasons with the breakdown. */
@@ -21,8 +30,16 @@ export function score(c: Candidate): number {
     wPts += Math.min(w.citedBy, 20) * 0.25;
     if (w.year >= 2025) wPts += 2;
   }
+  // Cap: a PI whose lab put out 12 matching papers must not out-score every student on volume alone.
+  const capped = wPts > WORKS_PTS_CAP;
+  wPts = Math.min(WORKS_PTS_CAP, wPts);
   s += wPts;
-  reasons.push(`${c.works.length} matching paper${c.works.length === 1 ? "" : "s"} (${firsts} first-author${others ? `, ${others} co-author` : ""}) +${r1(wPts)}`);
+  reasons.push(`${c.works.length} matching paper${c.works.length === 1 ? "" : "s"} (${firsts} first-author${others ? `, ${others} co-author` : ""}) +${r1(wPts)}${capped ? " (capped)" : ""}`);
+
+  // PI proxy from the papers themselves (works even when author stats are unavailable):
+  // last/corresponding author on 2+ matching papers and first author on none.
+  const lasts = c.works.filter((w) => w.position === "last" || (w.isCorresponding && w.position !== "first")).length;
+  if (firsts === 0 && lasts >= 2) { s -= 10; reasons.push(`senior/corresponding author on ${lasts} papers, first on none −10`); }
 
   if (c.isCurrentStudent === true) { s += 15; reasons.push("verified current student (ORCID) +15"); }
   if (c.isCurrentStudent === false) { s -= 15; reasons.push("education ended (ORCID) −15"); }
@@ -35,8 +52,10 @@ export function score(c: Candidate): number {
     reasons.push(`momentum: ${c.recentWorksCount}/${c.worksCount} papers in last 2 yrs +${m}`);
   }
 
-  if (c.worksCount !== null && c.worksCount > 30) { const p = Math.min(20, (c.worksCount - 30) / 5); s -= p; reasons.push(`established author (${c.worksCount} papers) −${r1(p)}`); }
-  if (c.firstPubYear !== null && c.firstPubYear < 2018) { s -= 10; reasons.push(`publishing since ${c.firstPubYear} −10`); }
+  // Faculty leakage: scales with the record and is relative to today, not a hardcoded year.
+  if (c.worksCount !== null && c.worksCount > 30) { const p = Math.min(40, (c.worksCount - 30) / 4); s -= p; reasons.push(`established author (${c.worksCount} papers) −${r1(p)}`); }
+  const nowY = new Date().getFullYear();
+  if (c.firstPubYear !== null && c.firstPubYear < nowY - 8) { s -= 15; reasons.push(`publishing since ${c.firstPubYear} −15`); }
 
   // Founder signals (lib/sources/*): sum weights per source, capped at SOURCE_CAP each.
   const bySource = new Map<string, Signal[]>();

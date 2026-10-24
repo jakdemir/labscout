@@ -56,3 +56,33 @@ test("no criteria -> no thesis-fit reason", () => {
   const c = base(); score(c);
   assert.ok(!c.reasons.some((r) => r.startsWith("thesis fit")));
 });
+
+// --- ranking fixes: faculty leakage, student check, works cap ---
+const NOW = new Date().getFullYear();
+test("isCurrentStudent: open education entry that started >8 years ago is not a current student", () => {
+  assert.equal(isCurrentStudent([{ institution: "Columbia", degree: "PhD", startYear: NOW - 12, endYear: null }]), false);
+});
+test("isCurrentStudent: open entry but faculty-scale record (700 works) -> false", () => {
+  const edu = [{ institution: "Columbia", degree: "PhD", startYear: null, endYear: null }];
+  assert.equal(isCurrentStudent(edu, { worksCount: 787, firstPubYear: 2004 }), false);
+  assert.equal(isCurrentStudent(edu, { worksCount: 5, firstPubYear: NOW - 2 }), true);
+  assert.equal(isCurrentStudent(edu, { worksCount: null, firstPubYear: null }), true);
+});
+test("12 lab papers as middle author do not out-score a first-author student (works points capped)", () => {
+  const w = base().works[0];
+  const pi = base({ works: Array.from({ length: 12 }, (_, i) => ({ ...w, id: `W${i}`, position: "middle" as const, citedBy: 20 })), worksCount: 787, firstPubYear: 2004 });
+  const student = base({ isCurrentStudent: true, worksCount: 4, recentWorksCount: 4 });
+  assert.ok(score(pi) < score(student), `${score(pi)} vs ${score(student)}`);
+  assert.ok(pi.reasons.some((r) => r.includes("(capped)")));
+});
+test("last/corresponding author on 2+ papers and first on none -> PI proxy penalty, even without author stats", () => {
+  const w = base().works[0];
+  const c = base({ works: [{ ...w, position: "last" }, { ...w, id: "W2", position: "middle", isCorresponding: true }], worksCount: null, firstPubYear: null });
+  score(c);
+  assert.ok(c.reasons.some((r) => r.startsWith("senior/corresponding author on 2")));
+});
+test("unknown author stats (null) carry no penalty and no momentum, but also no free pass vs known student", () => {
+  const unknown = base({ worksCount: null, citedByCount: null, firstPubYear: null, recentWorksCount: null });
+  score(unknown);
+  assert.ok(!unknown.reasons.some((r) => r.startsWith("established") || r.startsWith("publishing since")));
+});
