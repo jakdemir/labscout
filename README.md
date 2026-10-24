@@ -21,7 +21,7 @@ Built at **Deal Flow — NYC's first VC hackathon** (Betaworks, October 24, 2026
 - [OpenAlex](https://api.openalex.org) — works and author metadata
 - [ORCID public API](https://pub.orcid.org) — education / enrollment status
 - [Nicrron](https://api.nicrron.ai) — Claude access for keyword extraction and briefs
-- 23 founder-signal sources (GitHub, arXiv, Semantic Scholar, NSF, NIH, Hugging Face, PyPI/npm, Zenodo, Crossref, ORCID, Europe PMC, CORDIS, Wikidata, dissertation repositories, NY corporations, SEC Form D, USAspending, ClinicalTrials.gov, Y Combinator, Bluesky, Hacker News, …) — see [docs/SOURCES.md](docs/SOURCES.md)
+- 24 founder-signal sources (GitHub, paper→code repos, arXiv, Semantic Scholar, NSF, NIH, Hugging Face, PyPI/npm, Zenodo, Crossref, ORCID, Europe PMC, CORDIS, Wikidata, dissertation repositories, NY corporations, SEC Form D, USAspending, ClinicalTrials.gov, Y Combinator, Bluesky, Hacker News, …) — see [docs/SOURCES.md](docs/SOURCES.md)
 
 ## Run locally
 

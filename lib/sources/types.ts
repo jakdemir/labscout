@@ -5,7 +5,7 @@ import type { Candidate } from "../types.ts";
 export type SourceId =
   | "github" | "arxiv" | "semanticscholar" | "nsf" | "patentsview" | "sbir"
   // builder
-  | "huggingface" | "packages" | "zenodo"
+  | "huggingface" | "packages" | "zenodo" | "papercode"
   // academic / identity
   | "crossref" | "orcid" | "europepmc" | "cordis" | "wikidata" | "dissertations" | "nih"
   // entity formation / money

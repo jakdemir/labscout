@@ -123,7 +123,7 @@ const ENTITY_SOURCES = new Set(["nycorp", "edgar", "usaspending", "sbir", "paten
 const GRANT_SOURCES = new Set(["nsf", "nih"]);
 // Sources whose identity comes from a verified handle / ID chain (GitHub profile with affiliation in bio, packages and
 // HN posts linked to that GitHub, YC founder pages, ORCID iD) rather than a bare name. Safe for common names.
-const HANDLE_SOURCES = new Set(["github", "packages", "hackernews", "yc", "huggingface", "orcid"]);
+const HANDLE_SOURCES = new Set(["github", "packages", "hackernews", "yc", "huggingface", "orcid", "papercode"]);
 // Wave-2 sources that only exist because of the GitHub account found in wave 1.
 const FROM_GITHUB = new Set(["github", "packages", "hackernews"]);
 /** ORCID records with the same given + family name at or above which a name counts as common. */

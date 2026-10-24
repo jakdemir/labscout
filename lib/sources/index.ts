@@ -11,6 +11,7 @@ import { source as sbir } from "./sbir.ts";
 import { source as huggingface } from "./huggingface.ts";
 import { source as packages } from "./packages.ts";
 import { source as zenodo } from "./zenodo.ts";
+import { source as papercode } from "./papercode.ts";
 // academic / identity
 import { source as crossref } from "./crossref.ts";
 import { source as orcid } from "./orcid.ts";
@@ -31,7 +32,7 @@ import { source as hackernews } from "./hackernews.ts";
 
 export const SOURCES: SourceModule[] = [
   github, arxiv, semanticscholar, nsf, patentsview, sbir,
-  huggingface, packages, zenodo,
+  huggingface, packages, zenodo, papercode,
   crossref, orcid, europepmc, cordis, wikidata, dissertations, nih,
   nycorp, edgar, usaspending, clinicaltrials, yc,
   bluesky, hackernews,
