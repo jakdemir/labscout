@@ -2,7 +2,7 @@
 // list to public/data/hackathon.json (served by the Hackathon tab). Resumable: per-attendee results are cached
 // in .cache/hackathon.json, so a rerun only processes people new to the sheet (--fresh redoes everyone).
 //   node scripts/hackathon.ts [--csv path] [--concurrency 8] [--briefs 25] [--openalex] [--limit N] [--fresh] [--rebrief]
-// OpenAlex author matching is opt-in (--openalex): its free tier is a shared per-IP daily budget the live Scout tab needs.
+// OpenAlex author matching is opt-in (--openalex): its free tier is a shared per-IP daily budget the live Search tab needs.
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 
 try {

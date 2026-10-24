@@ -1,5 +1,5 @@
 // Partner memo: one printable page for the current shortlist. Pure function (tests/memo.test.ts);
-// the Scout page opens it in a new tab with document.write. Relative font URLs resolve against the opener.
+// the Search page opens it in a new tab with document.write. Relative font URLs resolve against the opener.
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 const a = (u, t) => (/^https?:\/\//i.test(String(u || "")) ? `<a href="${esc(u)}">${esc(t)}</a>` : esc(t));
 const VERD = { yes: "Yes", partial: "Partial", no: "No" };

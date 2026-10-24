@@ -33,7 +33,7 @@
 
   var path = location.pathname.replace(/\.html$/, "").replace(/\/+$/, "") || "/";
   var TABS = [
-    { href: "/", label: "Scout", icon: "chat", match: ["/", "/index"] },
+    { href: "/", label: "Search", icon: "chat", match: ["/", "/index"] },
     { href: "/hackathon", label: "Hackathon", icon: "award", match: ["/hackathon"] },
     { href: "/sponsors", label: "Sponsors", icon: "plug", match: ["/sponsors"] },
     { href: "/docs", label: "Architecture", icon: "layers", match: ["/docs"] },

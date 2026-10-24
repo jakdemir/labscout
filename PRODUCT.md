@@ -10,7 +10,7 @@
 3. Forward a brief to a partner as-is.
 
 **Surfaces (4 tabs):**
-- **Scout** (`/`): chat. Thesis in → ranked student cards as the reply. Follow-ups refine ("only Columbia", "current students only", "top 3", "with GitHub", "more like #2").
+- **Search** (`/`): chat. Thesis in → ranked student cards as the reply. Follow-ups refine ("only Columbia", "current students only", "top 3", "with GitHub", "more like #2").
 - **Hackathon** (`/hackathon`): every Deal Flow attendee from the organizers' team sheet, batch-run through the signal sources (`node scripts/hackathon.ts` → `public/data/hackathon.json`) and ranked; people and team views. Emails used for matching only, never published.
 - **Sponsors** (`/sponsors`): live proof that NicrronNinoo, PRISM, akta.pro and Roundtable each run on every search.
 - **Architecture** (`/docs`): how it works, data sources by founder-signal stage, REST + MCP endpoints, run locally.

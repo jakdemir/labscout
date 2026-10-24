@@ -362,7 +362,7 @@
           ["trace", ig.prism === false ? "off" : "search:" + esc(LS.slug(q))]
         ]).then(function () { return load(true); }).then(function () { msg.textContent = cands.length + " students ranked in " + secs + " s. Green +N = new since page load."; });
       })
-      .catch(function (err) { msg.className = "runmsg bad"; msg.textContent = "Search failed: " + err.message + ". Try again or use the Scout tab."; })
+      .catch(function (err) { msg.className = "runmsg bad"; msg.textContent = "Search failed: " + err.message + ". Try again or use the Search tab."; })
       .then(function () { go.disabled = false; $("#go-i").innerHTML = LS.icon("arrow"); $("#go-l").textContent = "Run search"; });
   };
 })();

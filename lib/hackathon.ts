@@ -1,5 +1,5 @@
 // Hackathon tab: turns the Deal Flow attendee sheet into Labscout candidates, then ranks them with the
-// same founder-signal score the Scout tab uses. Pure helpers here; the batch runner is scripts/hackathon.ts.
+// same founder-signal score the Search tab uses. Pure helpers here; the batch runner is scripts/hackathon.ts.
 import type { Candidate, Work } from "./types.ts";
 import type { Signal } from "./sources/types.ts";
 import { rankPeople, type Components } from "./rank.ts";
@@ -111,7 +111,7 @@ export function affiliations(a: Pick<Attendee, "org" | "email">): string[] {
   return out;
 }
 
-/** Context for the signal sources. Keywords stay empty on purpose: the Scout pipeline's topic-overlap fallback
+/** Context for the signal sources. Keywords stay empty on purpose: the Search pipeline's topic-overlap fallback
  *  assumes a pre-filtered, on-thesis population; on 500 mixed attendees it matches common names to strangers. */
 export function contextFor(a: Attendee): { query: string; keywords: string } {
   return { query: a.theme || a.title, keywords: "" };
@@ -130,7 +130,7 @@ const FROM_GITHUB = new Set(["github", "packages", "hackernews"]);
 export const COMMON_NAME = 25;
 export const VERIFIED_GH = /\((public email matches registration|same handle \+ name as LinkedIn)\)$/;
 
-/** Hackathon-strict filter on top of the Scout sources (which assume a pre-filtered student population):
+/** Hackathon-strict filter on top of the Search sources (which assume a pre-filtered student population):
  *  - registries must name the attendee's own company; NSF/NIH awards must name their org or university;
  *  - a GitHub account found by name search (not email/handle) needs the attendee's org or university in its
  *    company/bio, else it and everything derived from it (packages, HN) is dropped — `.edu` alone is not enough;
