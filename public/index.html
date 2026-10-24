@@ -48,6 +48,15 @@
   .srow .edge { position: absolute; inset: 29px 0 -29px 0; border: var(--bw) solid var(--ink); border-bottom: 0; border-radius: 10px 10px 0 0; background: var(--sheet); }
   .srow .ftab { position: absolute; top: 0; left: calc(var(--x) * (100% - 236px)); width: 236px; z-index: 1; height: 31px; }
   .srow .ftab .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* cabinet: the selected card lifts out of its slot; its slot stays empty, every other card stays put */
+  .cab { position: relative; }
+  .lifted { position: relative; z-index: 3; margin-inline: calc(var(--d) * 6px); margin-bottom: 22px; }
+  .lifted .ltab { position: relative; height: 31px; }
+  .lifted .ftab { position: absolute; top: 0; left: calc(var(--x) * (100% - 236px)); width: 236px; z-index: 4; height: 31px; }
+  .lifted .ftab .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lifted .open { border-top: var(--bw) solid var(--ink); border-radius: var(--r-lg); margin-top: calc(var(--bw) * -1); box-shadow: var(--lift); }
+  .srow.gone .edge { visibility: hidden; }
+  .cab .drawer { margin-top: -6px; padding-top: 44px; }
   .open { position: relative; background: var(--sheet); border: var(--bw) solid var(--ink); border-top: 0; border-radius: 0 0 var(--r-lg) var(--r-lg); padding: 22px 32px 28px; display: grid; gap: 20px; z-index: 2; }
   .open-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
   .open-head .name-xl { margin-right: 4px; }
@@ -103,8 +112,8 @@
     .open { padding: 18px 16px 22px; }
     .panel-dark { grid-template-columns: 1fr; padding: 22px 20px; gap: 12px; }
     .panel-dark .score-xl { font-size: 104px; }
-    .srow .ftab { width: 196px; left: calc(var(--x) * (100% - 196px)); gap: 10px; padding: 0 10px; }
-    .srow { margin-inline: calc(var(--d) * 3px); }
+    .srow .ftab, .lifted .ftab { width: 196px; left: calc(var(--x) * (100% - 196px)); gap: 10px; padding: 0 10px; }
+    .srow, .lifted { margin-inline: calc(var(--d) * 3px); }
     .evgrp { grid-template-columns: 1fr; gap: 4px; }
     .drawer { margin: 0 -16px; }
     .msg-u { max-width: 92%; }
@@ -186,6 +195,7 @@
   var BUILD = ["Any", "GitHub"];
   var XS = [1, .48, .1, .88, .34, .76, .04, .6, .22, .94, .4, .7];
   var MOCK_PARAM = location.search.indexOf("mock=1") !== -1;
+  var REDUCED = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
   var replies = [];   // {data, q, st, sel, meter, mail, el, ms}
   var lastQ = "";
@@ -402,6 +412,10 @@
         '<button type="button" class="btn ghost" data-act="copybrief">' + icon("copy", 14) + "<span>Copy brief</span></button></span></div>" +
     "</div>";
   }
+  function tabBtn(r, c, k, sel, settleI) {
+    return '<button type="button" class="ftab' + (settleI >= 0 ? " settle" : "") + '"' + (settleI >= 0 ? ' style="--i:' + settleI + '"' : "") + ' role="tab" id="tab-' + r.id + "-" + k + '" data-k="' + k + '" aria-selected="' + sel + '" aria-controls="open-' + r.id + '" tabindex="' + (sel ? 0 : -1) + '" title="Rank ' + (k + 1) + ": " + esc(c.name) + ", raw score " + esc(c.score) + '">' +
+      '<span class="id">' + pad(k + 1) + '</span><span class="nm">' + esc(short(c.name)) + "</span><b>" + norm(r, c) + "</b></button>";
+  }
   function renderDrawer(r) {
     var d = r.data, list = apply(r);
     r.list = list;
@@ -413,17 +427,22 @@
     if (!list.length) {
       html += '<div class="empty">No students match these filters. Clear a filter above or try a broader thesis.</div>';
     } else {
-      // back of the stack = lowest rank; front (bottom) = rank 1
-      var rows = "", n = list.length;
+      // back of the stack = lowest rank; front (bottom) = rank 1.
+      // The selected card is lifted above the cabinet; its slot stays empty so every other card keeps its place.
+      var rows = "", n = list.length, key = list.map(function (c) { return c.authorId || c.name; }).join("|");
+      var fresh = r.key !== key; r.key = key;
       for (var k = n - 1; k >= 0; k--) {
-        var c = list[k], depth = k, sel = k === r.sel;
-        rows += '<div class="srow" style="--d:' + depth + ";--x:" + XS[depth % XS.length] + '"><span class="edge"></span>' +
-          '<button type="button" class="ftab settle" style="--i:' + (n - 1 - k) + '" role="tab" id="tab-' + r.id + "-" + k + '" data-k="' + k + '" aria-selected="' + sel + '" aria-controls="open-' + r.id + '" tabindex="' + (sel ? 0 : -1) + '" title="Rank ' + (k + 1) + ": " + esc(c.name) + ", raw score " + esc(c.score) + '">' +
-          '<span class="id">' + pad(k + 1) + '</span><span class="nm">' + esc(short(c.name)) + "</span><b>" + norm(r, c) + "</b></button></div>";
+        var c = list[k], style = '--d:' + k + ";--x:" + XS[k % XS.length];
+        if (k === r.sel) { rows += '<div class="srow gone" style="' + style + '" aria-hidden="true"><span class="edge"></span></div>'; continue; }
+        rows += '<div class="srow" style="' + style + '"><span class="edge"></span>' + tabBtn(r, c, k, false, fresh ? n - 1 - k : -1) + "</div>";
       }
-      html += '<div class="stack" role="tablist" aria-label="Ranked students">' + rows + "</div>" + openCard(r, list[r.sel], r.sel);
+      var s = r.sel;
+      var lifted = '<div class="lifted" style="--d:' + s + ";--x:" + XS[s % XS.length] + '"><div class="ltab">' + tabBtn(r, list[s], s, true, -1) + "</div>" + openCard(r, list[s], s) + "</div>";
+      html += '<div class="cab">' + lifted +
+        '<div class="stack" role="tablist" aria-label="Ranked students" aria-owns="tab-' + r.id + "-" + s + '">' + rows + "</div>" +
+        '<div class="drawer"><span class="tag-hi">student watchlist · ' + esc(d.keywords || r.q) + '</span><span class="handle" aria-hidden="true"></span></div></div>';
     }
-    html += '<div class="drawer"><span class="tag-hi">student watchlist · ' + esc(d.keywords || r.q) + '</span><span class="handle" aria-hidden="true"></span></div>';
+    if (!list.length) html += '<div class="drawer"><span class="tag-hi">student watchlist · ' + esc(d.keywords || r.q) + '</span><span class="handle" aria-hidden="true"></span></div>';
     var after = [];
     if (d.roundtable) after.push("<div>Saved to Roundtable · <code>" + esc(d.roundtable.path) + "</code>" + (d.roundtable.version ? " · v" + esc(d.roundtable.version) : "") + "</div>");
     var ig = d.integrations || {};
@@ -653,12 +672,41 @@
     var again = r.el.querySelector('[data-act="' + focusAct + '"]' + (focusK != null ? '[data-k="' + focusK + '"]' : ""));
     if (again) again.focus();
   });
+  function tabEl(r, k) { return r.el.querySelector("#tab-" + r.id + "-" + k); }
+  function rectOf(r, k) { var b = tabEl(r, k); return b ? b.getBoundingClientRect() : null; }
+  // FLIP: start the moved card where its tab was, then let it glide to its new place.
+  function glide(el, before, after) {
+    if (REDUCED || !el || !before || !after) return;
+    var dx = before.left - after.left, dy = before.top - after.top;
+    if (!dx && !dy) return;
+    el.style.transition = "none";
+    el.style.transform = "translate(" + dx + "px," + dy + "px)";
+    el.getBoundingClientRect();
+    el.style.transition = "transform .55s var(--ease)";
+    el.style.transform = "";
+    el.addEventListener("transitionend", function done() { el.style.transition = ""; el.removeEventListener("transitionend", done); });
+  }
   function selectTab(r, k, focus) {
     if (!r.list || !r.list.length) return;
     k = (k + r.list.length) % r.list.length;
-    if (k !== r.sel) { r.sel = k; r.meter = null; r.mail = null; }
+    var prev = r.sel, moved = k !== prev;
+    var fromSlot = moved ? rectOf(r, k) : null, fromLift = moved ? rectOf(r, prev) : null;
+    var st0 = r.el.querySelector(".stack"), top0 = st0 ? st0.getBoundingClientRect().top : null;
+    if (moved) { r.sel = k; r.meter = null; r.mail = null; }
     renderDrawer(r);
-    if (focus) { var b = r.el.querySelector("#tab-" + r.id + "-" + k); if (b) b.focus(); }
+    // the lifted card can change height; hold the cabinet still on screen so no other card moves
+    var st1 = r.el.querySelector(".stack");
+    if (moved && top0 != null && st1) { var dy = st1.getBoundingClientRect().top - top0; if (dy) window.scrollBy(0, dy); }
+    var b = tabEl(r, k);
+    if (moved) {
+      var lift = b && b.closest(".lifted"), liftTop = lift ? lift.getBoundingClientRect().top : 0;
+      glide(lift, fromSlot, b && b.getBoundingClientRect());
+      var back = tabEl(r, prev);
+      glide(back && back.closest(".srow"), fromLift, back && back.getBoundingClientRect());
+      // bring the lifted card's name into view if it rose above the sticky top bar (~64px)
+      if (lift && liftTop < 80) window.scrollBy({ top: liftTop - 80, behavior: REDUCED ? "auto" : "smooth" });
+    }
+    if (focus && b) b.focus({ preventScroll: true });
   }
   thread.addEventListener("keydown", function (e) {
     var t = e.target;

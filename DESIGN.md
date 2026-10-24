@@ -20,6 +20,11 @@ Type: **Inter Tight 700** tight (-0.045em) for names, headlines, scores · **Jet
 ## Components
 `.ls-tab` filter-pill tabs (active = black) · `.ftab` index-card tab (`ID  Name  Score`, selected = black) · `.panel-dark` + `.score-xl` · `.btn.hi` yellow REACH OUT · `.meters/.meter/.sq(.on)` 4-stage meter, last cell `.dark` (spinout intent ×weight) · `.tag-hi` yellow label · `.drawer` + `.handle` · `.label` mono caps · `.chip` mono outline pill.
 
+## Cabinet behavior
+- Selecting a tab lifts that card above the cabinet. Its tab keeps its horizontal position.
+- The card's slot stays empty. Every other card keeps its place; the page scroll holds the cabinet still.
+- Motion: one FLIP glide (.55s, `--ease`); off under `prefers-reduced-motion`.
+
 ## Rules
 - Outlines are 1.5px ink. No soft grey cards, no gradients, no emoji icons (LS.icon).
 - Yellow only for the one primary action per view, the drawer label and highlights.
