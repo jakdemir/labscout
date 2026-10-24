@@ -79,6 +79,18 @@
   .mail pre { white-space: pre-wrap; font-size: 13px; }
 
   .drawer { margin: -44px -24px 0; position: relative; z-index: 0; padding-top: 72px; }
+
+  /* pulled-up card: the selected card lifts above the stack with its tab at the same x; its slot stays empty */
+  .pulled { position: relative; z-index: 4; margin-bottom: 30px; }
+  .prow { position: relative; z-index: 3; height: 30px; margin-inline: calc(var(--d) * 6px); }
+  .prow .ftab { position: absolute; top: 0; left: calc(var(--x) * (100% - 236px)); width: 236px; height: 31.5px; }
+  .prow .ftab .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pulled .open { border-top: var(--bw) solid var(--ink); border-radius: var(--r-lg); box-shadow: var(--lift); }
+  .pulled.rise { animation: rise .55s var(--ease) both; }
+  @keyframes rise { from { transform: translateY(var(--from, 40px)); } to { transform: none; } }
+  .srow.gap .edge, .srow.gap .ftab { visibility: hidden; }
+  .stack + .drawer { margin-top: -20px; padding-top: 36px; }
+  @media (prefers-reduced-motion: reduce) { .pulled.rise { animation: none; } }
   .after { margin-top: 14px; display: grid; gap: 10px; font: 400 12.5px/1.5 var(--mono); color: var(--ink-2); }
   .integ { display: flex; flex-wrap: wrap; gap: 6px 16px; }
   .integ span { display: inline-flex; align-items: center; gap: 7px; }
@@ -103,8 +115,8 @@
     .open { padding: 18px 16px 22px; }
     .panel-dark { grid-template-columns: 1fr; padding: 22px 20px; gap: 12px; }
     .panel-dark .score-xl { font-size: 104px; }
-    .srow .ftab { width: 196px; left: calc(var(--x) * (100% - 196px)); gap: 10px; padding: 0 10px; }
-    .srow { margin-inline: calc(var(--d) * 3px); }
+    .srow .ftab, .prow .ftab { width: 196px; left: calc(var(--x) * (100% - 196px)); gap: 10px; padding: 0 10px; }
+    .srow, .prow { margin-inline: calc(var(--d) * 3px); }
     .evgrp { grid-template-columns: 1fr; gap: 4px; }
     .drawer { margin: 0 -16px; }
     .msg-u { max-width: 92%; }
@@ -197,6 +209,7 @@
   var XS = [1, .48, .1, .88, .34, .76, .04, .6, .22, .94, .4, .7];
   var MOCK_PARAM = location.search.indexOf("mock=1") !== -1;
   var DEMO_PARAM = /[?&]demo=1\b/.test(location.search);
+  var REDUCED = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var replies = [];   // {data, q, st, sel, meter, mail, el, ms}
   var lastQ = "";
@@ -465,15 +478,22 @@
     if (!list.length) {
       html += '<div class="empty">No students match these filters. Clear a filter above or try a broader thesis.</div>';
     } else {
-      // back of the stack = lowest rank; front (bottom) = rank 1
-      var rows = "", n = list.length;
+      // back of the stack = lowest rank; front (bottom) = rank 1.
+      // The selected card is pulled up above the stack (tab keeps its x); its slot stays empty, nothing else moves.
+      var rows = "", pulled = "", n = list.length, anim = !r.drawn;
+      r.drawn = true;
       for (var k = n - 1; k >= 0; k--) {
-        var c = list[k], depth = k, sel = k === r.sel;
-        rows += '<div class="srow" style="--d:' + depth + ";--x:" + XS[depth % XS.length] + '"><span class="edge"></span>' +
-          '<button type="button" class="ftab settle" style="--i:' + (n - 1 - k) + '" role="tab" id="tab-' + r.id + "-" + k + '" data-k="' + k + '" aria-selected="' + sel + '" aria-controls="open-' + r.id + '" tabindex="' + (sel ? 0 : -1) + '" title="Rank ' + (k + 1) + ": " + esc(c.name) + ", raw score " + esc(c.score) + '">' +
-          '<span class="id">' + pad(k + 1) + '</span><span class="nm">' + esc(short(c.name)) + "</span><b>" + norm(r, c) + "</b></button></div>";
+        var c = list[k], depth = k, sel = k === r.sel, pos = "--d:" + depth + ";--x:" + XS[depth % XS.length];
+        var tab = '<button type="button" class="ftab' + (anim && !sel ? " settle" : "") + '" style="--i:' + (n - 1 - k) + '" role="tab" id="tab-' + r.id + "-" + k + '" data-k="' + k + '" aria-selected="' + sel + '" aria-controls="open-' + r.id + '" tabindex="' + (sel ? 0 : -1) + '" title="Rank ' + (k + 1) + ": " + esc(c.name) + ", raw score " + esc(c.score) + '">' +
+          '<span class="id">' + pad(k + 1) + '</span><span class="nm">' + esc(short(c.name)) + "</span><b>" + norm(r, c) + "</b></button>";
+        if (sel) {
+          pulled = '<div class="pulled' + (anim ? " settle" : "") + '"><div class="prow" style="' + pos + '">' + tab + "</div>" + openCard(r, c, k) + "</div>";
+          rows += '<div class="srow gap" style="' + pos + '" aria-hidden="true"><span class="edge"></span></div>';
+        } else {
+          rows += '<div class="srow" style="' + pos + '"><span class="edge"></span>' + tab + "</div>";
+        }
       }
-      html += '<div class="stack" role="tablist" aria-label="Ranked students">' + rows + "</div>" + openCard(r, list[r.sel], r.sel);
+      html += pulled + '<div class="stack" role="tablist" aria-label="Ranked students" aria-owns="tab-' + r.id + "-" + r.sel + '">' + rows + "</div>";
     }
     html += '<div class="drawer"><span class="tag-hi">student watchlist · ' + esc(d.keywords || r.q) + '</span><span class="handle" aria-hidden="true"></span></div>';
     var after = [];
@@ -734,7 +754,7 @@
     else if (act === "copymail") { if (c) copy(emailText(c, r.data.keywords || r.q), t, "Copy email"); return; }
     else if (act === "memo") { exportMemo(r); return; }
     else return;
-    if (/school|status|build|win|sort|top/.test(act)) { r.sel = 0; r.meter = null; r.mail = null; }
+    if (/school|status|build|win|sort|top/.test(act)) { r.sel = 0; r.meter = null; r.mail = null; r.drawn = false; }
     var focusAct = act, focusK = t.getAttribute("data-k");
     renderDrawer(r);
     var again = r.el.querySelector('[data-act="' + focusAct + '"]' + (focusK != null ? '[data-k="' + focusK + '"]' : ""));
@@ -743,9 +763,20 @@
   function selectTab(r, k, focus) {
     if (!r.list || !r.list.length) return;
     k = (k + r.list.length) % r.list.length;
-    if (k !== r.sel) { r.sel = k; r.meter = null; r.mail = null; }
+    var from = null;
+    if (k !== r.sel) {
+      var old = r.el.querySelector("#tab-" + r.id + "-" + k);
+      if (old) from = old.getBoundingClientRect().top;   // where the tab sat in the drawer
+      r.sel = k; r.meter = null; r.mail = null;
+    }
     renderDrawer(r);
-    if (focus) { var b = r.el.querySelector("#tab-" + r.id + "-" + k); if (b) b.focus(); }
+    var b = r.el.querySelector("#tab-" + r.id + "-" + k), p = r.el.querySelector(".pulled");
+    if (from != null && b && p) {
+      var dy = Math.round(from - b.getBoundingClientRect().top);
+      if (dy && !REDUCED) { p.style.setProperty("--from", dy + "px"); p.classList.add("rise"); }
+      p.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "nearest" });
+    }
+    if (focus && b) b.focus({ preventScroll: true });
   }
   thread.addEventListener("keydown", function (e) {
     var t = e.target;
