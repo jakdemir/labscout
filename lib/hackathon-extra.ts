@@ -26,6 +26,7 @@ export const TEAM_MOVES: { name: string; team: number | null; teamName: string; 
   { name: "Vince", team: null, teamName: "Left team 9 (Labscout)" },
   { name: "Siva Koneru", team: null, teamName: "Left team 9 (Labscout)" },
   { name: "Negar Maleki", team: 9, teamName: "Labscout" },
+  { name: "Jayprakash M", team: 9, teamName: "Labscout" },
 ];
 
 export function applyMoves<T extends Pick<Attendee, "name" | "team" | "teamName" | "theme">>(people: T[]): T[] {
