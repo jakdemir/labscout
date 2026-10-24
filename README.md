@@ -43,5 +43,8 @@ Zero dependencies. Node 26 native TypeScript. Vercel serverless function (`api/s
 - Jak Akdemir — Protocogni Labs
 - Yi Liu — Columbia Business School
 - Mirah Xu — GreenerIntelligence
+- Negar Maleki — General Motors
+- Tyler Bryan - Primitive AI Inc.
+- Prakash Koneru - Rakuten
 
 All code written on build day, October 24, 2026.
